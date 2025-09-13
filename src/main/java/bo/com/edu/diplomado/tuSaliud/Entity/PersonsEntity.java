@@ -22,6 +22,13 @@ public class PersonsEntity {
     private String personDni;
     private String personBirthdate;
     private Integer personAge;
+    private Integer personStatus;
+    @ManyToOne
+    @JoinColumn(name = "gender_id", nullable = false)
+    private GendersEntity gender;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private RolesEntity role;
 
 
 

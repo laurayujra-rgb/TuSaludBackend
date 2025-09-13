@@ -1,7 +1,10 @@
 package bo.com.edu.diplomado.tuSaliud.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +18,8 @@ public class RolesEntity {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long roleId;
     private String roleName;
+    private Integer roleStatus;
+    @JsonIgnore
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<GendersEntity> roles;
 }
