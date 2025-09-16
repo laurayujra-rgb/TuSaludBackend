@@ -20,16 +20,20 @@ public class PersonsEntity {
     private String personFatherSurname;
     private String personMotherSurname;
     private String personDni;
-    private String personBirthdate;
+    private String personBirthdate; // considera LocalDate en el futuro
     private Integer personAge;
     private Integer personStatus;
-    @ManyToOne
-    @JoinColumn(name = "gender_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gender_id", nullable = false, referencedColumnName = "genderId")
     private GendersEntity gender;
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false, referencedColumnName = "roleId")
     private RolesEntity role;
 
-
-
+    @PrePersist
+    public void prePersist() {
+        this.personStatus = 1;
+    }
 }

@@ -1,0 +1,24 @@
+server:
+  port: 8080   # Puerto donde correrá tu backend
+
+spring:
+  application:
+    name: tuSaliud   # Nombre de tu app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tusalud   # Cambia según tu BD
+    username: tusalud
+    password: secret12345
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update   # update | validate | create | create-drop
+    show-sql: true       # Muestra las queries en consola
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG

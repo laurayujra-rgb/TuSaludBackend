@@ -1,5 +1,4 @@
 package bo.com.edu.diplomado.tuSaliud.Controller;
-
 import bo.com.edu.diplomado.tuSaliud.Models.Request.ApiRequest;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,14 +12,12 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 @Controller
 @Slf4j
 public class ApiController {
