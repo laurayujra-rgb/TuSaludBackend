@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -79,17 +79,17 @@ public class PersonsController extends ApiController{
          return logApiResponse(response);
     }
     @PostMapping("/create")
-    public ApiResponse<Optional<PersonsEntity>> createPerson(@RequestBody PersonsRequest personsRequest){
+    public ApiResponse<Optional<PersonsEntity>> createPerson(@RequestBody PersonsEntity personsEntity){
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();
         try{
-            Optional<GendersEntity> gender = gendersService.getGenderById(personsRequest.getGenderId());
+            Optional<GendersEntity> gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
             if(gender.isEmpty()){
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("Gender  was not found");
                 return logApiResponse(response);
             }
-            Optional<RolesEntity> role = rolesService.getRolesById(personsRequest.getRoleId());
+            Optional<RolesEntity> role = rolesService.getRolesById(personsEntity.getRole().getRoleId());
             if(role.isEmpty()){
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
@@ -97,15 +97,19 @@ public class PersonsController extends ApiController{
                 return logApiResponse(response);
             }
             PersonsEntity person = new PersonsEntity();
-            person.setPersonName(personsRequest.getPersonName());
-            person.setPersonFatherSurname(personsRequest.getPersonFatherSurname());
-            person.setPersonMotherSurname(personsRequest.getPersonMotherSurname());
-            person.setPersonDni(personsRequest.getPersonDni());
-            person.setPersonBirthdate(personsRequest.getPersonBirthdate());
-            person.setPersonAge(personsRequest.getPersonAge());
-            person.setPersonStatus(personsRequest.getPersonStatus());
+            person.setPersonName(personsEntity.getPersonName());
+            person.setPersonFatherSurname(personsEntity.getPersonFatherSurname());
+            person.setPersonMotherSurname(personsEntity.getPersonMotherSurname());
+            person.setPersonDni(personsEntity.getPersonDni());
+            person.setPersonBirthdate(personsEntity.getPersonBirthdate());
+            person.setPersonAge(personsEntity.getPersonAge());
+            person.setPersonStatus(personsEntity.getPersonStatus());
             person.setGender(gender.get());
             person.setRole(role.get());
+            Optional<PersonsEntity> createPerson = personsService.createPerson(person);
+            response.setData(createPerson);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
         }catch(ConstraintViolationException e){
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
@@ -115,8 +119,8 @@ public class PersonsController extends ApiController{
         }
         return logApiResponse(response);
     }
-    @GetMapping("/update/{id}")
-    public ApiResponse<Optional<PersonsEntity>> updatePerson(@PathVariable Long id, @RequestBody PersonsRequest personsRequest ){
+    @PutMapping("/update/{id}")
+    public ApiResponse<Optional<PersonsEntity>> updatePerson(@PathVariable Long id, @RequestBody PersonsEntity personsEntity ){
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();
         try{
             Optional<PersonsEntity> existingPerson = personsService.getPersonById(id);
@@ -127,27 +131,27 @@ public class PersonsController extends ApiController{
                 return logApiResponse(response);
             }
 //            validate if gender exists
-            Optional<GendersEntity>gender = gendersService.getGenderById(personsRequest.getGenderId());
+            Optional<GendersEntity>gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
             if(gender.isEmpty()){
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("gender was not found");
             }
 //            validate if rol exists
-            Optional<RolesEntity>role =  rolesService.getRolesById(personsRequest.getRoleId());
+            Optional<RolesEntity>role =  rolesService.getRolesById(personsEntity.getRole().getRoleId());
             if(role.isEmpty()){
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("role was not found");
             }
             PersonsEntity updatePersons = new PersonsEntity();
-            updatePersons.setPersonName(personsRequest.getPersonName());
-            updatePersons.setPersonFatherSurname(personsRequest.getPersonFatherSurname());
-            updatePersons.setPersonMotherSurname(personsRequest.getPersonMotherSurname());
-            updatePersons.setPersonDni(personsRequest.getPersonDni());
-            updatePersons.setPersonBirthdate(personsRequest.getPersonBirthdate());
-            updatePersons.setPersonAge(personsRequest.getPersonAge());
-            updatePersons.setPersonStatus(personsRequest.getPersonStatus());
+            updatePersons.setPersonName(personsEntity.getPersonName());
+            updatePersons.setPersonFatherSurname(personsEntity.getPersonFatherSurname());
+            updatePersons.setPersonMotherSurname(personsEntity.getPersonMotherSurname());
+            updatePersons.setPersonDni(personsEntity.getPersonDni());
+            updatePersons.setPersonBirthdate(personsEntity.getPersonBirthdate());
+            updatePersons.setPersonAge(personsEntity.getPersonAge());
+            updatePersons.setPersonStatus(personsEntity.getPersonStatus());
             updatePersons.setGender(gender.get());
             updatePersons.setRole(role.get());
             Optional<PersonsEntity> updateEntity = personsService.updatePerson(id, updatePersons);

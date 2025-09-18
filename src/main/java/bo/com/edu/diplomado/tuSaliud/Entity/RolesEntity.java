@@ -25,7 +25,7 @@ public class RolesEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private List<PersonsEntity> persons = new ArrayList<>();
+    private List<PersonsEntity> persons;
 
     @PrePersist
     public void prePersist() {
