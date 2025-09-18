@@ -36,4 +36,9 @@ public class PersonsEntity {
     public void prePersist() {
         this.personStatus = 1;
     }
+
+    // Relación inversa (opcional). No todos tienen cuenta.
+    @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private AccountsEntity account;
 }
