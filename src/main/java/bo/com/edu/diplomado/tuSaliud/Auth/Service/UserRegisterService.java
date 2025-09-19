@@ -2,7 +2,7 @@ package bo.com.edu.diplomado.tuSaliud.Auth.Service;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.*;
 import bo.com.edu.diplomado.tuSaliud.Models.Dto.AccountResponse;
-import bo.com.edu.diplomado.tuSaliud.Models.Dto.UserRegisterRequest;
+import bo.com.edu.diplomado.tuSaliud.Auth.Dto.Request.UserRegisterRequest;
 import bo.com.edu.diplomado.tuSaliud.Repository.AccountsRepository;
 import bo.com.edu.diplomado.tuSaliud.Repository.GendersRepository;
 import bo.com.edu.diplomado.tuSaliud.Repository.PersonsRepository;

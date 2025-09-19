@@ -1,4 +1,4 @@
-package bo.com.edu.diplomado.tuSaliud.Models.Dto;
+package bo.com.edu.diplomado.tuSaliud.Auth.Dto.Request;
 
 import jakarta.validation.constraints.*;
 import org.antlr.v4.runtime.misc.NotNull;

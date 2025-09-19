@@ -3,7 +3,7 @@ package bo.com.edu.diplomado.tuSaliud.Auth.Controller;
 
 
 import bo.com.edu.diplomado.tuSaliud.Models.Dto.AccountResponse;
-import bo.com.edu.diplomado.tuSaliud.Models.Dto.UserRegisterRequest;
+import bo.com.edu.diplomado.tuSaliud.Auth.Dto.Request.UserRegisterRequest;
 import bo.com.edu.diplomado.tuSaliud.Auth.Service.UserRegisterService;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
 import jakarta.validation.Valid;
