@@ -1,4 +1,4 @@
-package bo.com.edu.diplomado.tuSaliud.Service;
+package bo.com.edu.diplomado.tuSaliud.Auth.Service;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.*;
 import bo.com.edu.diplomado.tuSaliud.Models.Dto.AccountResponse;
@@ -7,6 +7,7 @@ import bo.com.edu.diplomado.tuSaliud.Repository.AccountsRepository;
 import bo.com.edu.diplomado.tuSaliud.Repository.GendersRepository;
 import bo.com.edu.diplomado.tuSaliud.Repository.PersonsRepository;
 import bo.com.edu.diplomado.tuSaliud.Repository.RolesRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;   // 👈 IMPORTANTE
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class UserRegisterService {
 
+    @Autowired
     private final PersonsRepository personsRepo;
     private final AccountsRepository accountsRepo;
     private final GendersRepository gendersRepo;

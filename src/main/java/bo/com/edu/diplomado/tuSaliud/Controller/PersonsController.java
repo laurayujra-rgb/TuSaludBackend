@@ -3,9 +3,7 @@ package bo.com.edu.diplomado.tuSaliud.Controller;
 import bo.com.edu.diplomado.tuSaliud.Entity.GendersEntity;
 import bo.com.edu.diplomado.tuSaliud.Entity.PersonsEntity;
 import bo.com.edu.diplomado.tuSaliud.Entity.RolesEntity;
-import bo.com.edu.diplomado.tuSaliud.Models.Request.PersonsRequest;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
-import bo.com.edu.diplomado.tuSaliud.Models.Response.PersonsResponse;
 import bo.com.edu.diplomado.tuSaliud.Service.GendersService;
 import bo.com.edu.diplomado.tuSaliud.Service.PersonsService;
 import bo.com.edu.diplomado.tuSaliud.Service.RolesService;
@@ -48,8 +46,8 @@ public class PersonsController extends ApiController{
         return logApiResponse(response);
     }
     @GetMapping("/{id}")
-    public ApiResponse<PersonsResponse> getPersonById(@PathVariable Long id){
-         ApiResponse<PersonsResponse> response = new ApiResponse<>();
+    public ApiResponse<PersonsEntity> getPersonById(@PathVariable Long id){
+         ApiResponse<PersonsEntity> response = new ApiResponse<>();
          try{
              Optional<PersonsEntity> optionalPerson = personsService.getPersonById(id);
              if(optionalPerson.isEmpty()){
@@ -58,7 +56,7 @@ public class PersonsController extends ApiController{
                  response.setMessage("person was not found");
                  return logApiResponse(response);
              }
-                PersonsResponse personsResponse = new PersonsResponse();
+                PersonsEntity personsResponse = new PersonsEntity();
                 personsResponse.setPersonId(optionalPerson.get().getPersonId());
                 personsResponse.setPersonName(optionalPerson.get().getPersonName());
                 personsResponse.setPersonFatherSurname(optionalPerson.get().getPersonFatherSurname());
