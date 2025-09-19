@@ -53,7 +53,7 @@ public class PersonsController extends ApiController{
              if(optionalPerson.isEmpty()){
                  response.setStatus(HttpStatus.BAD_REQUEST.value());
                  response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                 response.setMessage("person was not found");
+                 response.setMessage("la persona no fue encontrada");
                  return logApiResponse(response);
              }
                 PersonsEntity personsResponse = new PersonsEntity();

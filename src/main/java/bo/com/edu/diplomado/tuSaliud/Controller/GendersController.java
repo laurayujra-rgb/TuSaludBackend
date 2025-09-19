@@ -1,5 +1,4 @@
 package bo.com.edu.diplomado.tuSaliud.Controller;
-
 import bo.com.edu.diplomado.tuSaliud.Entity.GendersEntity;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
 import bo.com.edu.diplomado.tuSaliud.Service.GendersService;
@@ -7,15 +6,11 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
-
-
 @RestController
 @RequestMapping("/api/gender")
 public class GendersController extends ApiController {
-
     @Autowired
     private GendersService gendersService;
     @GetMapping("/all")
@@ -27,7 +22,6 @@ public class GendersController extends ApiController {
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
-    
     @GetMapping("/{id}")
     public ApiResponse<GendersEntity> getGenerById(@PathVariable Long id){
         ApiResponse<GendersEntity> response = new ApiResponse<>();
