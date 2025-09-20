@@ -10,21 +10,23 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "rooms")
+@ToString
 @Entity
-@Table(name = "Rooms")
-public class RoomsEntity {
+@Table(name = "Beds")
+public class BedsEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long roomId;
-    private String roomName;
-    private Integer roomStatus;
+    private long bedId;
+    private String bedName;
+    private Integer bedStatus;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
-    private List<BedsEntity> beds;
+    @ManyToOne
+    @JoinColumn(name = "room_id", nullable = false)
+    private RoomsEntity room;
+
     @PrePersist
     public void prePersist() {
-        this.roomStatus = 1;
+        this.bedStatus = 1;
     }
 }
