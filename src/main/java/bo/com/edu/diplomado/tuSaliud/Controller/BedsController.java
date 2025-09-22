@@ -113,7 +113,6 @@ public class BedsController extends ApiController{
         ApiResponse<Optional<BedsEntity>> response = new ApiResponse<>();
         try{
             Optional<BedsEntity> existingBed = bedsService.deleteBed(id);
-
                 response.setStatus(HttpStatus.OK.value());
                 response.setMessage(HttpStatus.OK.getReasonPhrase());
                 response.setMessage("Cama eliminada con exito");
@@ -124,5 +123,4 @@ public class BedsController extends ApiController{
         }
         return logApiResponse(response);
     }
-
 }
