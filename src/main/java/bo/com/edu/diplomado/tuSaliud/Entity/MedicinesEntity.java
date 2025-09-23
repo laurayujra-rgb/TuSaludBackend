@@ -28,6 +28,8 @@ public class MedicinesEntity {
     @JoinColumn(name = "via_id", nullable = false)
     private ViaEntity via;
 
+    @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, orphanRemoval = false)
+    private java.util.List<KardexMedicinesEntity> kardexMedicines = new java.util.ArrayList<>();
 
     @PrePersist
     public void prePersist() {
