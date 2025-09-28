@@ -13,4 +13,8 @@ public interface BedsRepository extends JpaRepository<BedsEntity, Long> {
     List<BedsEntity> findAllByStatus();
     @Query("select b from BedsEntity b where b.bedId=?1 and b.bedStatus=?2")
     BedsEntity findByIdAndByStatus(Long id, long status);
+
+    // 🔹 Nuevo método: buscar todas las camas por roomId y status activo
+    @Query("SELECT b FROM BedsEntity b WHERE b.room.roomId = :roomId AND b.bedStatus = 1")
+    List<BedsEntity> findByRoomIdAndStatus(Long roomId);
 }

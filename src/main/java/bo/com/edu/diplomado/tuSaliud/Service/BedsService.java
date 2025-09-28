@@ -40,4 +40,8 @@ public class BedsService {
         return Optional.of(bedsRepository.save(bed));
     }
 
+    public List<BedsEntity> getBedsByRoomId(Long roomId){
+        return bedsRepository.findByRoomIdAndStatus(roomId);
+    }
+
 }

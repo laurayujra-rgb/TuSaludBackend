@@ -30,6 +30,28 @@ public class BedsController extends ApiController{
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
+//    get bed by roomId
+// 🔹 Nuevo endpoint: obtener camas por roomId
+@GetMapping("/room/{roomId}")
+public ApiResponse<List<BedsEntity>> getBedsByRoomId(@PathVariable Long roomId) {
+    ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
+    try {
+        List<BedsEntity> beds = bedsService.getBedsByRoomId(roomId);
+        if (beds.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            response.setMessage("No se encontraron camas para esta habitación");
+            return logApiResponse(response);
+        }
+        response.setData(beds);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage(HttpStatus.OK.getReasonPhrase());
+    } catch (Exception e) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setMessage("Error al obtener camas: " + e.getMessage());
+    }
+    return logApiResponse(response);
+}
+
     @GetMapping("/{id}")
     public ApiResponse<BedsEntity> getBedById(@PathVariable  Long id){
         ApiResponse<BedsEntity> response = new ApiResponse<>();
