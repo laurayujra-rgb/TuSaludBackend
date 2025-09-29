@@ -1,5 +1,6 @@
 package bo.com.edu.diplomado.tuSaliud.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,8 +38,8 @@ public class PersonsEntity {
         this.personStatus = 1;
     }
 
-    // Relación inversa (opcional). No todos tienen cuenta.
     @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
+    @JsonIgnore   // 👈 Agrega esto
     @ToString.Exclude
     private AccountsEntity account;
 }

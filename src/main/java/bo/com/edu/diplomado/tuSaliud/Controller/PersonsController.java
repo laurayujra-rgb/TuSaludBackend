@@ -76,6 +76,27 @@ public class PersonsController extends ApiController{
          }
          return logApiResponse(response);
     }
+
+    @GetMapping("/role/{roleId}")
+    public ApiResponse<List<PersonsEntity>> getPersonsByRoleId(@PathVariable Long roleId) {
+        ApiResponse<List<PersonsEntity>> response = new ApiResponse<>();
+        try {
+            List<PersonsEntity> persons = personsService.getPersonsByRoleId(roleId);
+            if (persons.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron personas con este rol");
+                return logApiResponse(response);
+            }
+            response.setData(persons);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al obtener personas por rol");
+        }
+        return logApiResponse(response);
+    }
+
     @PostMapping("/create")
     public ApiResponse<Optional<PersonsEntity>> createPerson(@RequestBody PersonsEntity personsEntity){
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();

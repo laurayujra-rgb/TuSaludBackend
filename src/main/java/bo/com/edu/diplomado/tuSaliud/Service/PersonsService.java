@@ -55,5 +55,9 @@ public class PersonsService {
           return Optional.of(personsRepository.save(person));
     }
 
+    public List<PersonsEntity> getPersonsByRoleId(Long roleId) {
+        return personsRepository.findAllByRoleId(roleId);
+    }
+
 
 }
