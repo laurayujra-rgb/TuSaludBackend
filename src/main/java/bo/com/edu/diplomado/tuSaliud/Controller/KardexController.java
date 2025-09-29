@@ -1,13 +1,11 @@
 package bo.com.edu.diplomado.tuSaliud.Controller;
 
-
 import bo.com.edu.diplomado.tuSaliud.Entity.DietsEntity;
 import bo.com.edu.diplomado.tuSaliud.Entity.KardexEntity;
+import bo.com.edu.diplomado.tuSaliud.Models.Dto.KardexDto;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
 import bo.com.edu.diplomado.tuSaliud.Service.DietsService;
 import bo.com.edu.diplomado.tuSaliud.Service.KardexService;
-import bo.com.edu.diplomado.tuSaliud.Service.RolesService;
-import org.apache.naming.EjbRef;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,134 +16,124 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/kardex")
-public class KardexController extends ApiController{
-    
+public class KardexController extends ApiController {
+
     @Autowired
     public KardexService kardexService;
+
     @Autowired
     public DietsService dietsService;
-    @Autowired
-    private RolesService rolesService;
 
+    // ===== GET /all
     @GetMapping("/all")
-    public ApiResponse<List<KardexEntity>> getAllKardex(){
-        ApiResponse<List<KardexEntity>> response = new ApiResponse<>();
-        List<KardexEntity> kardex = kardexService.getAllKardex();
-        response.setData(kardex);
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage(HttpStatus.OK.getReasonPhrase());
+    public ApiResponse<List<KardexDto>> getAllKardex() {
+        ApiResponse<List<KardexDto>> response = new ApiResponse<>();
+        try {
+            List<KardexDto> list = kardexService.toDtoList(kardexService.getAllKardex());
+            response.setData(list);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
         return logApiResponse(response);
     }
-    @GetMapping
-    public ApiResponse<List<KardexEntity>> getAllKardexByStatus(){
-        ApiResponse<List<KardexEntity>> response = new ApiResponse<>();
-        List<KardexEntity> kardex = kardexService.getAllKardexByStatus();
-        response.setData(kardex);
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage(HttpStatus.OK.getReasonPhrase());
-        return logApiResponse(response);
-    }
+
+    // ===== GET /{id}
     @GetMapping("/{id}")
-    public ApiResponse<KardexEntity> getKardexById(@PathVariable Long id){
-        ApiResponse<KardexEntity> response = new ApiResponse<>();
-        try{
-            Optional<KardexEntity> optionalKardex = kardexService.getKardexById(id);
-            if(optionalKardex.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+    public ApiResponse<KardexDto> getKardexById(@PathVariable Long id) {
+        ApiResponse<KardexDto> response = new ApiResponse<>();
+        try {
+            Optional<KardexEntity> opt = kardexService.getKardexById(id);
+            if (opt.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
                 response.setMessage("Kardex no encontrado");
                 return logApiResponse(response);
             }
-            KardexEntity kardexResponse = new KardexEntity();
-            kardexResponse.setKardexId(optionalKardex.get().getKardexId());
-            kardexResponse.setKardexNumber(optionalKardex.get().getKardexNumber());
-            kardexResponse.setKardexDiagnosis(optionalKardex.get().getKardexDiagnosis());
-            kardexResponse.setKardexDate(optionalKardex.get().getKardexDate());
-            kardexResponse.setKardexHour(optionalKardex.get().getKardexHour());
-            kardexResponse.setKardexStatus(optionalKardex.get().getKardexStatus());
-            kardexResponse.setDiets(optionalKardex.get().getDiets());
-            response.setData(kardexResponse);
+            response.setData(kardexService.toDto(opt.get()));
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage(e.getMessage());
         }
         return logApiResponse(response);
     }
-    @PostMapping("/create")
-    public ApiResponse<Optional<KardexEntity>> createKardex(@RequestBody KardexEntity kardexEntity){
-        ApiResponse<Optional<KardexEntity>> response = new ApiResponse<>();
-        try{
-            Optional<DietsEntity> diet = dietsService.getDietById(kardexEntity.getDiets().getDietId());
-            if(diet.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("la dieta no fue encontrada");
-                return logApiResponse(response);
-            }
-            KardexEntity newKardex = new KardexEntity();
-            newKardex.setKardexNumber(kardexEntity.getKardexNumber());
-            newKardex.setKardexDiagnosis(kardexEntity.getKardexDiagnosis());
-            newKardex.setKardexDate(kardexEntity.getKardexDate());
-            newKardex.setKardexHour(kardexEntity.getKardexHour());
-            newKardex.setKardexStatus(kardexEntity.getKardexStatus());
-            newKardex.setDiets(diet.get());
-            newKardex.setNursingActions(kardexEntity.getNursingActions());
-            Optional<KardexEntity> createdKardex = kardexService.createKardex(newKardex);
-            response.setData(createdKardex);
-            response.setStatus(HttpStatus.CREATED.value());
-            response.setMessage(HttpStatus.CREATED.getReasonPhrase());
-        }catch (ConstraintViolationException e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }
-        return logApiResponse(response);
-    }
-    @PutMapping("/update/{id}")
-    public ApiResponse<Optional<KardexEntity>> updateKardex(@PathVariable Long id, @RequestBody KardexEntity kardexEntity){
-        ApiResponse<Optional<KardexEntity>> response = new ApiResponse<>();
-        try{
-            Optional<DietsEntity> diet = dietsService.getDietById(kardexEntity.getDiets().getDietId());
-            if(diet.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("la dieta no fue encontrada");
-                return logApiResponse(response);
-            }
-            KardexEntity updatedKardex = new KardexEntity();
-            updatedKardex.setKardexNumber(kardexEntity.getKardexNumber());
-            updatedKardex.setKardexDate(kardexEntity.getKardexDate());
-            updatedKardex.setKardexHour(kardexEntity.getKardexHour());
-            updatedKardex.setKardexStatus(kardexEntity.getKardexStatus());
-            updatedKardex.setDiets(diet.get());
-            updatedKardex.setKardexDiagnosis(kardexEntity.getKardexDiagnosis());
-            updatedKardex.setNursingActions(kardexEntity.getNursingActions());
-            Optional<KardexEntity> kardex = kardexService.updateKardex(id, updatedKardex);
-            response.setData(kardex);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
 
-        }catch (Exception e){
+    // ===== POST /create
+    @PostMapping("/create")
+    public ApiResponse<KardexDto> createKardex(@RequestBody KardexEntity kardexEntity) {
+        ApiResponse<KardexDto> response = new ApiResponse<>();
+        try {
+            Optional<DietsEntity> diet = dietsService.getDietById(kardexEntity.getDiets().getDietId());
+            if (diet.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Dieta no encontrada");
+                return logApiResponse(response);
+            }
+            kardexEntity.setDiets(diet.get());
+            Optional<KardexEntity> created = kardexService.createKardex(kardexEntity);
+            if (created.isPresent()) {
+                response.setData(kardexService.toDto(created.get()));
+                response.setStatus(HttpStatus.CREATED.value());
+                response.setMessage(HttpStatus.CREATED.getReasonPhrase());
+            }
+        } catch (ConstraintViolationException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage("Restricción violada");
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
         }
         return logApiResponse(response);
     }
-    @DeleteMapping("/delete/{id}")
-    public ApiResponse<Optional<KardexEntity>> deleteKardex(@PathVariable Long id){
-        ApiResponse<Optional<KardexEntity>> response = new ApiResponse<>();
-        try{
-            Optional<KardexEntity> kardex = kardexService.deleteKardex(id);
-            response.setData(kardex);
+
+    // ===== PUT /update/{id}
+    @PutMapping("/update/{id}")
+    public ApiResponse<KardexDto> updateKardex(@PathVariable Long id, @RequestBody KardexEntity kardexEntity) {
+        ApiResponse<KardexDto> response = new ApiResponse<>();
+        try {
+            Optional<DietsEntity> diet = dietsService.getDietById(kardexEntity.getDiets().getDietId());
+            if (diet.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Dieta no encontrada");
+                return logApiResponse(response);
+            }
+            kardexEntity.setDiets(diet.get());
+            Optional<KardexEntity> updated = kardexService.updateKardex(id, kardexEntity);
+            if (updated.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Kardex no encontrado");
+                return logApiResponse(response);
+            }
+            response.setData(kardexService.toDto(updated.get()));
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
+
+    // ===== DELETE /delete/{id}
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<KardexDto> deleteKardex(@PathVariable Long id) {
+        ApiResponse<KardexDto> response = new ApiResponse<>();
+        try {
+            Optional<KardexEntity> deleted = kardexService.deleteKardex(id);
+            if (deleted.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Kardex no encontrado");
+                return logApiResponse(response);
+            }
+            response.setData(kardexService.toDto(deleted.get()));
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
         }
         return logApiResponse(response);
     }

@@ -16,8 +16,5 @@ public interface KardexMedicinesRepository extends JpaRepository<KardexMedicines
 
     void deleteByKardex_KardexIdAndMedicine_MedicineId(Long kardexId, Long medicineId);
 
-    // Si luego quieres filtrar por status=1, puedes crear:
-    // List<KardexMedicinesEntity> findByKardex_KardexIdAndStatus(Long kardexId, Integer status);
-    // List<KardexMedicinesEntity> findByMedicine_MedicineIdAndStatus(Long medicineId, Integer status);
-    // Optional<KardexMedicinesEntity> findByIdAndStatus(Long id, Integer status);
+
 }

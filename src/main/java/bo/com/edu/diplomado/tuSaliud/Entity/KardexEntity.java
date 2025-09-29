@@ -1,9 +1,11 @@
 package bo.com.edu.diplomado.tuSaliud.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -34,7 +36,8 @@ public class KardexEntity {
     private DietsEntity diets;
 
     @OneToMany(mappedBy = "kardex", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<KardexMedicinesEntity> kardexMedicines = new java.util.ArrayList<>();
+    @JsonManagedReference
+    private List<KardexMedicinesEntity> kardexMedicines = new ArrayList<>();
 
     private String nursingActions;
 
