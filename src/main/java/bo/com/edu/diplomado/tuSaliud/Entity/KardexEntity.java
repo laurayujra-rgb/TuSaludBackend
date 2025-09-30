@@ -40,7 +40,6 @@ public class KardexEntity {
     // Relación con signos vitales
     @JsonIgnore
     @OneToMany(mappedBy = "kardex", fetch = FetchType.LAZY)
-
     private List<VitalSignsEntity> vitalSigns;
 
     // Relación con dietas
@@ -52,6 +51,10 @@ public class KardexEntity {
     @OneToMany(mappedBy = "kardex", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KardexMedicinesEntity> kardexMedicines = new ArrayList<>();
+
+    // Relación con reportes
+    @OneToMany(mappedBy = "kardex", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportsEntity> reports = new ArrayList<>();
 
     private String nursingActions;
 
