@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -38,8 +41,21 @@ public class PersonsEntity {
         this.personStatus = 1;
     }
 
+    // Relación con cuenta
     @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
-    @JsonIgnore   // 👈 Agrega esto
+    @JsonIgnore
     @ToString.Exclude
     private AccountsEntity account;
+
+    // Relación: Persona como Paciente en muchos Kardex
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<KardexEntity> kardexAsPatient = new ArrayList<>();
+
+    // Relación: Persona como Enfermera en muchos Kardex
+    @OneToMany(mappedBy = "nurse", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<KardexEntity> kardexAsNurse = new ArrayList<>();
 }

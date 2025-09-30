@@ -13,4 +13,7 @@ public interface VitalSignsRepository extends JpaRepository<VitalSignsEntity, Lo
     List<VitalSignsEntity> findAllByStatus();
     @Query("select b from VitalSignsEntity b where b.vitalSignsId=?1 and b.vitalSignsStatus=?2")
     VitalSignsEntity findByIdAndByStatus(Long id, long status);
+
+    List<VitalSignsEntity> findByKardex_KardexIdAndVitalSignsStatus(Long kardexId, Integer status);
+
 }

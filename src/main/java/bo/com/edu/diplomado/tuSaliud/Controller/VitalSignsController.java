@@ -73,6 +73,7 @@ public class VitalSignsController extends ApiController{
         }
         return logApiResponse(response);
     }
+
     @PostMapping("/create")
     public ApiResponse<Optional<VitalSignsEntity>> createVitalSigns(@RequestBody VitalSignsEntity vitalSignsEntity){
         ApiResponse<Optional<VitalSignsEntity>> response = new ApiResponse<>();
@@ -109,6 +110,26 @@ public class VitalSignsController extends ApiController{
         }
         return logApiResponse(response);
     }
+    @GetMapping("/kardex/{kardexId}")
+    public ApiResponse<List<VitalSignsEntity>> getVitalSignsByKardex(@PathVariable Long kardexId) {
+        ApiResponse<List<VitalSignsEntity>> response = new ApiResponse<>();
+        try {
+            List<VitalSignsEntity> vitalSigns = vitalSignsService.getByKardexId(kardexId);
+            if (vitalSigns.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron signos vitales para este kardex");
+                return logApiResponse(response);
+            }
+            response.setData(vitalSigns);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
+
 
     @PutMapping("/update/{id}")
     public ApiResponse<Optional<VitalSignsEntity>> updateVitalSigns(@PathVariable Long id, @RequestBody VitalSignsEntity vitalSignsEntity){

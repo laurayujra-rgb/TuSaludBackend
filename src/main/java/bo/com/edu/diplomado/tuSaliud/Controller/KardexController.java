@@ -60,6 +60,52 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
+//    get kardex by patient id
+
+    // ===== GET /patient/{patientId}
+    @GetMapping("/patient/{patientId}")
+    public ApiResponse<List<KardexDto>> getKardexByPatient(@PathVariable Long patientId) {
+        ApiResponse<List<KardexDto>> response = new ApiResponse<>();
+        try {
+            List<KardexDto> kardexList = kardexService.getKardexDtoByPatientId(patientId);
+            if (kardexList.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron kardex para este paciente");
+                return logApiResponse(response);
+            }
+            response.setData(kardexList);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
+    // ===== GET /patient/{patientId}/role/{roleId}
+    @GetMapping("/patient/{patientId}/role/{roleId}")
+    public ApiResponse<List<KardexDto>> getKardexByPatientAndRole(
+            @PathVariable Long patientId,
+            @PathVariable Long roleId) {
+
+        ApiResponse<List<KardexDto>> response = new ApiResponse<>();
+        try {
+            List<KardexDto> kardexList = kardexService.getKardexDtoByPatientAndRole(patientId, roleId);
+            if (kardexList.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron kardex para este paciente y rol");
+                return logApiResponse(response);
+            }
+            response.setData(kardexList);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
+
 
     // ===== POST /create
     @PostMapping("/create")
@@ -116,6 +162,8 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
+
+
 
     // ===== DELETE /delete/{id}
     @DeleteMapping("/delete/{id}")

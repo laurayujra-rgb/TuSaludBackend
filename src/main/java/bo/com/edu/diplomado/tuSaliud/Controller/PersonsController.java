@@ -47,35 +47,25 @@ public class PersonsController extends ApiController{
     }
     @GetMapping("/{id}")
     public ApiResponse<PersonsEntity> getPersonById(@PathVariable Long id){
-         ApiResponse<PersonsEntity> response = new ApiResponse<>();
-         try{
-             Optional<PersonsEntity> optionalPerson = personsService.getPersonById(id);
-             if(optionalPerson.isEmpty()){
-                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                 response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                 response.setMessage("la persona no fue encontrada");
-                 return logApiResponse(response);
-             }
-                PersonsEntity personsResponse = new PersonsEntity();
-                personsResponse.setPersonId(optionalPerson.get().getPersonId());
-                personsResponse.setPersonName(optionalPerson.get().getPersonName());
-                personsResponse.setPersonFatherSurname(optionalPerson.get().getPersonFatherSurname());
-                personsResponse.setPersonMotherSurname(optionalPerson.get().getPersonMotherSurname());
-                personsResponse.setPersonDni(optionalPerson.get().getPersonDni());
-                personsResponse.setPersonBirthdate(optionalPerson.get().getPersonBirthdate());
-                personsResponse.setPersonAge(optionalPerson.get().getPersonAge());
-                personsResponse.setPersonStatus(optionalPerson.get().getPersonStatus());
-                personsResponse.setGender(personsResponse.getGender());
-                personsResponse.setRole(personsResponse.getRole());
-                response.setData(personsResponse);
-                response.setStatus(HttpStatus.OK.value());
-                response.setMessage(HttpStatus.OK.getReasonPhrase());
-         }catch (Exception e){
-             response.setStatus(HttpStatus.BAD_REQUEST.value());
-             response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-         }
-         return logApiResponse(response);
+        ApiResponse<PersonsEntity> response = new ApiResponse<>();
+        try{
+            Optional<PersonsEntity> optionalPerson = personsService.getPersonById(id);
+            if(optionalPerson.isEmpty()){
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("La persona no fue encontrada");
+                return logApiResponse(response);
+            }
+            // ✅ Devuelve directamente la entidad encontrada
+            response.setData(optionalPerson.get());
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        }catch (Exception e){
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al obtener persona");
+        }
+        return logApiResponse(response);
     }
+
 
     @GetMapping("/role/{roleId}")
     public ApiResponse<List<PersonsEntity>> getPersonsByRoleId(@PathVariable Long roleId) {

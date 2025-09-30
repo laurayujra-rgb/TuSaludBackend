@@ -46,4 +46,9 @@ public class VitalSignsService {
         sign.setVitalSignsStatus(0);
         return Optional.of(vitalSignsRepository.save(sign));
     }
+
+    public List<VitalSignsEntity> getByKardexId(Long kardexId) {
+        return vitalSignsRepository.findByKardex_KardexIdAndVitalSignsStatus(kardexId, 1);
+    }
+
 }

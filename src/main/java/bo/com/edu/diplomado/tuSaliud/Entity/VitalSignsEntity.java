@@ -1,5 +1,6 @@
 package bo.com.edu.diplomado.tuSaliud.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class VitalSignsEntity {
 
     @ManyToOne
     @JoinColumn(name = "kardex_id", nullable = false)
+    @JsonIgnoreProperties({"vitalSigns"})
     private KardexEntity kardex;
 
     @PrePersist

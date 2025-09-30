@@ -83,4 +83,20 @@ public class KardexService {
         kardex.setKardexStatus(0);
         return Optional.of(kardexRepository.save(kardex));
     }
+
+    public List<KardexDto> getKardexDtoByPatientId(Long patientId) {
+        return kardexRepository.findAllByPatientId(patientId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<KardexDto> getKardexDtoByPatientAndRole(Long patientId, Long roleId) {
+        return kardexRepository.findAllByPatientIdAndRoleId(patientId, roleId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
 }
