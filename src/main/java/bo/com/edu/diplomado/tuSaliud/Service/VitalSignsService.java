@@ -1,6 +1,7 @@
 package bo.com.edu.diplomado.tuSaliud.Service;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.VitalSignsEntity;
+import bo.com.edu.diplomado.tuSaliud.Models.Dto.VitalSignsDto;
 import bo.com.edu.diplomado.tuSaliud.Repository.VitalSignsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,5 +51,27 @@ public class VitalSignsService {
     public List<VitalSignsEntity> getByKardexId(Long kardexId) {
         return vitalSignsRepository.findByKardex_KardexIdAndVitalSignsStatus(kardexId, 1);
     }
+
+
+    public VitalSignsDto toDto(VitalSignsEntity entity) {
+        if (entity == null) return null;
+        return new VitalSignsDto(
+                entity.getVitalSignsId(),
+                entity.getVitalSignsDate(),
+                entity.getVitalSignsHour(),
+                entity.getVitalSignsTemperature(),
+                entity.getVitalSignsHeartRate(),
+                entity.getVitalSignsRespiratoryRate(),
+                entity.getVitalSignsBloodPressure(),
+                entity.getVitalSignsOxygenSaturation(),
+                entity.getVitalSignsStatus(),
+                entity.getKardex() != null ? entity.getKardex().getKardexId() : null
+        );
+    }
+
+    public List<VitalSignsDto> toDtoList(List<VitalSignsEntity> entities) {
+        return entities.stream().map(this::toDto).toList();
+    }
+
 
 }

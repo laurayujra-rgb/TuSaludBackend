@@ -3,6 +3,7 @@ package bo.com.edu.diplomado.tuSaliud.Controller;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.KardexEntity;
 import bo.com.edu.diplomado.tuSaliud.Entity.VitalSignsEntity;
+import bo.com.edu.diplomado.tuSaliud.Models.Dto.VitalSignsDto;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
 import bo.com.edu.diplomado.tuSaliud.Service.KardexService;
 import bo.com.edu.diplomado.tuSaliud.Service.VitalSignsService;
@@ -24,9 +25,9 @@ public class VitalSignsController extends ApiController{
     public KardexService kardexService;
 
     @GetMapping("/all")
-    public ApiResponse<List<VitalSignsEntity>> getAllVitalSigns(){
-        ApiResponse<List<VitalSignsEntity>> response = new ApiResponse<>();
-        List<VitalSignsEntity> vitalSigns = vitalSignsService.getAllVitalSigns();
+    public ApiResponse<List<VitalSignsDto>> getAllVitalSigns() {
+        ApiResponse<List<VitalSignsDto>> response = new ApiResponse<>();
+        List<VitalSignsDto> vitalSigns = vitalSignsService.toDtoList(vitalSignsService.getAllVitalSigns());
         response.setData(vitalSigns);
         response.setStatus(HttpStatus.OK.value());
         response.setMessage(HttpStatus.OK.getReasonPhrase());
@@ -75,16 +76,17 @@ public class VitalSignsController extends ApiController{
     }
 
     @PostMapping("/create")
-    public ApiResponse<Optional<VitalSignsEntity>> createVitalSigns(@RequestBody VitalSignsEntity vitalSignsEntity){
-        ApiResponse<Optional<VitalSignsEntity>> response = new ApiResponse<>();
-        try{
+
+    public ApiResponse<VitalSignsDto> createVitalSigns(@RequestBody VitalSignsEntity vitalSignsEntity) {
+        ApiResponse<VitalSignsDto> response = new ApiResponse<>();
+        try {
             Optional<KardexEntity> kardex = kardexService.getKardexById(vitalSignsEntity.getKardex().getKardexId());
-            if(kardex.isEmpty()) {
+            if (kardex.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("El kardex no fue encontrado");
                 return logApiResponse(response);
             }
+
             VitalSignsEntity vitalSigns = new VitalSignsEntity();
             vitalSigns.setVitalSignsDate(vitalSignsEntity.getVitalSignsDate());
             vitalSigns.setVitalSignsHour(vitalSignsEntity.getVitalSignsHour());
@@ -95,24 +97,24 @@ public class VitalSignsController extends ApiController{
             vitalSigns.setVitalSignsOxygenSaturation(vitalSignsEntity.getVitalSignsOxygenSaturation());
             vitalSigns.setVitalSignsStatus(vitalSignsEntity.getVitalSignsStatus());
             vitalSigns.setKardex(kardex.get());
+
             Optional<VitalSignsEntity> createdVitalSigns = vitalSignsService.createVitalSigns(vitalSigns);
-            response.setData(createdVitalSigns);
-            response.setStatus(HttpStatus.CREATED.value());
-            response.setMessage(HttpStatus.CREATED.getReasonPhrase());
-        }catch (ConstraintViolationException e){
+
+            if (createdVitalSigns.isPresent()) {
+                response.setData(vitalSignsService.toDto(createdVitalSigns.get())); // 👈 convertir a DTO
+                response.setStatus(HttpStatus.CREATED.value());
+                response.setMessage(HttpStatus.CREATED.getReasonPhrase());
+            }
+        } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-            response.setMessage(e.getMessage());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
             response.setMessage(e.getMessage());
         }
         return logApiResponse(response);
     }
+
     @GetMapping("/kardex/{kardexId}")
-    public ApiResponse<List<VitalSignsEntity>> getVitalSignsByKardex(@PathVariable Long kardexId) {
-        ApiResponse<List<VitalSignsEntity>> response = new ApiResponse<>();
+    public ApiResponse<List<VitalSignsDto>> getVitalSignsByKardex(@PathVariable Long kardexId) {
+        ApiResponse<List<VitalSignsDto>> response = new ApiResponse<>();
         try {
             List<VitalSignsEntity> vitalSigns = vitalSignsService.getByKardexId(kardexId);
             if (vitalSigns.isEmpty()) {
@@ -120,7 +122,7 @@ public class VitalSignsController extends ApiController{
                 response.setMessage("No se encontraron signos vitales para este kardex");
                 return logApiResponse(response);
             }
-            response.setData(vitalSigns);
+            response.setData(vitalSignsService.toDtoList(vitalSigns));
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
         } catch (Exception e) {
