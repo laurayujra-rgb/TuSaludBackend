@@ -1,6 +1,7 @@
 package bo.com.edu.diplomado.tuSaliud.Service;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.KardexEntity;
+import bo.com.edu.diplomado.tuSaliud.Entity.PersonsEntity;
 import bo.com.edu.diplomado.tuSaliud.Models.Dto.KardexDto;
 import bo.com.edu.diplomado.tuSaliud.Repository.KardexRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,14 @@ public class KardexService {
     @Autowired
     private KardexRepository kardexRepository;
 
+    private String fullName(PersonsEntity p) {
+        if (p == null) return null;
+        String n = (p.getPersonName() == null ? "" : p.getPersonName());
+        String f = (p.getPersonFatherSurname() == null ? "" : " " + p.getPersonFatherSurname());
+        String m = (p.getPersonMotherSurname() == null ? "" : " " + p.getPersonMotherSurname());
+        return (n + f + m).trim().replaceAll("\\s+", " ");
+    }
+
     // ===== Mapper: Entity → DTO
     public KardexDto toDto(KardexEntity entity) {
         if (entity == null) return null;
@@ -29,7 +38,15 @@ public class KardexService {
                 entity.getKardexStatus(),
                 entity.getNursingActions(),
                 entity.getDiets() != null ? entity.getDiets().getDietId() : null,
-                entity.getDiets() != null ? entity.getDiets().getDietName() : null
+                entity.getDiets() != null ? entity.getDiets().getDietName() : null,
+
+                // 🔹 Paciente
+                entity.getPatient() != null ? entity.getPatient().getPersonId() : null,
+                entity.getPatient() != null ? fullName(entity.getPatient()) : null,
+
+                // 🔹 Enfermera
+                entity.getNurse() != null ? entity.getNurse().getPersonId() : null,
+                entity.getNurse() != null ? fullName(entity.getNurse()) : null
         );
     }
 
@@ -70,6 +87,8 @@ public class KardexService {
         kardex.setKardexHour(kardexEntity.getKardexHour());
         kardex.setNursingActions(kardexEntity.getNursingActions());
         kardex.setDiets(kardexEntity.getDiets());
+        kardex.setPatient(kardexEntity.getPatient());
+        kardex.setNurse(kardexEntity.getNurse());
         return Optional.of(kardexRepository.save(kardex));
     }
 
@@ -97,6 +116,4 @@ public class KardexService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-
-
 }

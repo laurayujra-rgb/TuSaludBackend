@@ -28,10 +28,8 @@ public class MedicinesService {
     public Optional<MedicinesEntity> updateMedicnes(Long id, MedicinesEntity medicinesEntity){
         MedicinesEntity medicine = medicinesRepository.findByIdAndByStatus(id, 1L);
         medicine.setMedicineName(medicinesEntity.getMedicineName());
-        medicine.setMedicineDateToEnd(medicinesEntity.getMedicineDateToEnd());
-        medicine.setMedicineMoorning(medicinesEntity.getMedicineMoorning());
-        medicine.setMedicineAfternoon(medicinesEntity.getMedicineAfternoon());
-        medicine.setMedicineEvening(medicinesEntity.getMedicineEvening());
+        medicine.setMedicineLaboratory(medicinesEntity.getMedicineLaboratory());
+
         return Optional.of(medicinesRepository.save(medicine));
     }
     public Optional<MedicinesEntity>deleteMedicine(Long id){

@@ -4,7 +4,6 @@ import bo.com.edu.diplomado.tuSaliud.Entity.KardexMedicinesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface KardexMedicinesRepository extends JpaRepository<KardexMedicinesEntity, Long> {
 
@@ -15,6 +14,4 @@ public interface KardexMedicinesRepository extends JpaRepository<KardexMedicines
     boolean existsByKardex_KardexIdAndMedicine_MedicineId(Long kardexId, Long medicineId);
 
     void deleteByKardex_KardexIdAndMedicine_MedicineId(Long kardexId, Long medicineId);
-
-
 }

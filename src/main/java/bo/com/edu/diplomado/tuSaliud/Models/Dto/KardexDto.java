@@ -21,4 +21,10 @@ public class KardexDto {
     // Dieta (simplificada)
     private Long dietId;
     private String dietName;
+
+    private Long patientId;
+    private String patientName;
+
+    private Long nurseId;
+    private String nurseName;
 }

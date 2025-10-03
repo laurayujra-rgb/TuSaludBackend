@@ -17,10 +17,7 @@ public class MedicinesEntity {
     private long medicineId;
 
     private String medicineName;
-    private String medicineDateToEnd;
-    private String medicineMoorning;
-    private String medicineAfternoon;
-    private String medicineEvening;
+    private String medicineLaboratory;
 
     private Integer medicineStatus;
 

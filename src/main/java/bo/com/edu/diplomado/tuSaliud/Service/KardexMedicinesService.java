@@ -113,4 +113,10 @@ public class KardexMedicinesService {
     public void deleteByPair(Long kardexId, Long medicineId) {
         kardexMedicinesRepository.deleteByKardex_KardexIdAndMedicine_MedicineId(kardexId, medicineId);
     }
+
+    public List<KardexMedicineDto> getByKardex(Long kardexId) {
+        List<KardexMedicinesEntity> entities = kardexMedicinesRepository.findByKardex_KardexId(kardexId);
+        return toDtoList(entities);
+    }
+
 }

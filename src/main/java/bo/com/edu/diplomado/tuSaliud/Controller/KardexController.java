@@ -60,7 +60,6 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
-//    get kardex by patient id
 
     // ===== GET /patient/{patientId}
     @GetMapping("/patient/{patientId}")
@@ -82,6 +81,7 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
+
     // ===== GET /patient/{patientId}/role/{roleId}
     @GetMapping("/patient/{patientId}/role/{roleId}")
     public ApiResponse<List<KardexDto>> getKardexByPatientAndRole(
@@ -106,7 +106,6 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-
     // ===== POST /create
     @PostMapping("/create")
     public ApiResponse<KardexDto> createKardex(@RequestBody KardexEntity kardexEntity) {
@@ -119,6 +118,7 @@ public class KardexController extends ApiController {
                 return logApiResponse(response);
             }
             kardexEntity.setDiets(diet.get());
+
             Optional<KardexEntity> created = kardexService.createKardex(kardexEntity);
             if (created.isPresent()) {
                 response.setData(kardexService.toDto(created.get()));
@@ -162,8 +162,6 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
-
-
 
     // ===== DELETE /delete/{id}
     @DeleteMapping("/delete/{id}")

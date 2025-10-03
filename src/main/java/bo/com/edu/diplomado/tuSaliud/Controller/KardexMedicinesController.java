@@ -55,6 +55,26 @@ public class KardexMedicinesController extends ApiController {
         }
         return logApiResponse(response);
     }
+    // GET /api/kardex-medicines/by-kardex/{kardexId}
+    @GetMapping("/by-kardex/{kardexId}")
+    public ApiResponse<List<KardexMedicineDto>> getByKardex(@PathVariable Long kardexId) {
+        ApiResponse<List<KardexMedicineDto>> response = new ApiResponse<>();
+        try {
+            List<KardexMedicineDto> list = kardexMedicinesService.getByKardex(kardexId);
+            if (list.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No hay medicamentos registrados para este kardex");
+            } else {
+                response.setData(list);
+                response.setStatus(HttpStatus.OK.value());
+                response.setMessage(HttpStatus.OK.getReasonPhrase());
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
 
     // ===== POST /create
     @PostMapping("/create")

@@ -47,10 +47,8 @@ public class MedicineController extends ApiController {
             MedicinesEntity medicineResponse = new MedicinesEntity();
             medicineResponse.setMedicineId(medicine.get().getMedicineId());
             medicineResponse.setMedicineName(medicine.get().getMedicineName());
-            medicineResponse.setMedicineDateToEnd(medicine.get().getMedicineDateToEnd());
-            medicineResponse.setMedicineMoorning(medicine.get().getMedicineMoorning());
-            medicineResponse.setMedicineAfternoon(medicine.get().getMedicineAfternoon());
-            medicineResponse.setMedicineEvening(medicine.get().getMedicineEvening());
+            medicineResponse.setMedicineLaboratory(medicine.get().getMedicineLaboratory());
+
             medicineResponse.setMedicineStatus(medicine.get().getMedicineStatus());
             medicineResponse.setVia(medicine.get().getVia());
             response.setData(medicineResponse);
@@ -76,10 +74,7 @@ public class MedicineController extends ApiController {
             }
             MedicinesEntity newMedicine = new MedicinesEntity();
             newMedicine.setMedicineName(medicinesEntity.getMedicineName());
-            newMedicine.setMedicineDateToEnd(medicinesEntity.getMedicineDateToEnd());
-            newMedicine.setMedicineMoorning(medicinesEntity.getMedicineMoorning());
-            newMedicine.setMedicineAfternoon(medicinesEntity.getMedicineAfternoon());
-            newMedicine.setMedicineEvening(medicinesEntity.getMedicineEvening());
+            newMedicine.setMedicineLaboratory(medicinesEntity.getMedicineLaboratory());
             newMedicine.setMedicineStatus(medicinesEntity.getMedicineStatus());
             newMedicine.setVia(via.get());
             Optional<MedicinesEntity> createdMedicine = medicinesService.createMedicine(newMedicine);
@@ -109,10 +104,7 @@ public class MedicineController extends ApiController {
             }
             MedicinesEntity updatedMedicine = new MedicinesEntity();
             updatedMedicine.setMedicineName(medicinesEntity.getMedicineName());
-            updatedMedicine.setMedicineDateToEnd(medicinesEntity.getMedicineDateToEnd());
-            updatedMedicine.setMedicineMoorning(medicinesEntity.getMedicineMoorning());
-            updatedMedicine.setMedicineAfternoon(medicinesEntity.getMedicineAfternoon());
-            updatedMedicine.setMedicineEvening(medicinesEntity.getMedicineEvening());
+            updatedMedicine.setMedicineLaboratory(medicinesEntity.getMedicineLaboratory());
             updatedMedicine.setVia(via.get());
             Optional<MedicinesEntity> medicine = medicinesService.updateMedicnes(id, updatedMedicine);
             response.setData(medicine);
