@@ -1,11 +1,15 @@
 server:
-  port: 8080   # Puerto donde correrá tu backend
+  port: 8080   # Puerto donde correrï¿½ tu backend
 
 spring:
+  jwt:
+    secret: EstaEsUnaClaveSuperSecretaParaJWT1231QueTieneMasDe32Caracteres
+    expiration: 86400000  # 24 horas en milisegundos
+    refresh-expiration: 604800000  # 7 dÃ­as en milisegundos
   application:
     name: tuSaliud   # Nombre de tu app
   datasource:
-    url: jdbc:postgresql://localhost:5432/tusalud   # Cambia según tu BD
+    url: jdbc:postgresql://localhost:5432/tusalud   # Cambia segï¿½n tu BD
     username: tusalud
     password: secret12345
     driver-class-name: org.postgresql.Driver

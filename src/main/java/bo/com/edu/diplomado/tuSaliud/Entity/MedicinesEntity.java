@@ -1,10 +1,14 @@
 package bo.com.edu.diplomado.tuSaliud.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Setter
+import java.util.ArrayList;
+import java.util.List;
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -18,20 +22,19 @@ public class MedicinesEntity {
 
     private String medicineName;
     private String medicineLaboratory;
-
     private Integer medicineStatus;
 
     @ManyToOne
     @JoinColumn(name = "via_id", nullable = false)
+    @JsonIgnoreProperties({"medicines"}) // 👈 evita recursión desde Via->medicines
     private ViaEntity via;
 
     @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, orphanRemoval = false)
-    private java.util.List<KardexMedicinesEntity> kardexMedicines = new java.util.ArrayList<>();
+    @JsonIgnore // 👈 no serializar la lista para evitar recursión y Lazy init
+    private List<KardexMedicinesEntity> kardexMedicines = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
         this.medicineStatus = 1;
     }
-
-
 }

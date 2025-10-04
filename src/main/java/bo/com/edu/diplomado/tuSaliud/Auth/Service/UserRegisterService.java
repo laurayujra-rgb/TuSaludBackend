@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @Service
 public class UserRegisterService {
 
@@ -82,5 +84,16 @@ public class UserRegisterService {
                 saved.getAccountStatus(),
                 person.getPersonId()
         );
+    }
+
+//    exist email
+    public boolean existsByEmail(String email) {
+        return accountsRepo.existsByAccountEmail(email);
+    }
+
+//    find email
+
+    public Optional<AccountsEntity> findByEmail(String email) {
+        return accountsRepo.findByAccountEmail(email);
     }
 }
