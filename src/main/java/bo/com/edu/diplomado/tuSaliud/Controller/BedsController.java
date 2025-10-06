@@ -9,140 +9,106 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/bed")
-public class BedsController extends ApiController{
+public class BedsController extends ApiController {
+
     @Autowired
     private BedsService bedsService;
+
     @Autowired
     private RoomsService roomsService;
-    
-    @GetMapping("/all")
-    public ApiResponse<List<BedsEntity>> getAllBeds(){
-        ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
-        List<BedsEntity> beds = bedsService.getAllBeds();
-        response.setData(beds);
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage(HttpStatus.OK.getReasonPhrase());
-        return logApiResponse(response);
-    }
-//    get bed by roomId
-// 🔹 Nuevo endpoint: obtener camas por roomId
-@GetMapping("/room/{roomId}")
-public ApiResponse<List<BedsEntity>> getBedsByRoomId(@PathVariable Long roomId) {
-    ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
-    try {
-        List<BedsEntity> beds = bedsService.getBedsByRoomId(roomId);
-        if (beds.isEmpty()) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            response.setMessage("No se encontraron camas para esta habitación");
-            return logApiResponse(response);
-        }
-        response.setData(beds);
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage(HttpStatus.OK.getReasonPhrase());
-    } catch (Exception e) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setMessage("Error al obtener camas: " + e.getMessage());
-    }
-    return logApiResponse(response);
-}
 
-    @GetMapping("/{id}")
-    public ApiResponse<BedsEntity> getBedById(@PathVariable  Long id){
-        ApiResponse<BedsEntity> response = new ApiResponse<>();
-        try{
-            Optional<BedsEntity> bed = bedsService.getBedById(id);
-            if(bed.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("Cama no encotrada");
-                return logApiResponse(response);
-            }
-            BedsEntity bedResponse = new BedsEntity();
-            bedResponse.setBedId(bed.get().getBedId());
-            bedResponse.setBedName(bed.get().getBedName());
-            bedResponse.setBedStatus(bed.get().getBedStatus());
-            bedResponse.setRoom(bed.get().getRoom());
-            response.setData(bedResponse);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }
+    // 🔹 Todas las camas
+    @GetMapping("/all")
+    public ApiResponse<List<BedsEntity>> getAllBeds() {
+        ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
+        List<BedsEntity> beds = bedsService.getAllBedsByStatus();
+        response.setData(beds);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("OK");
         return logApiResponse(response);
     }
+
+    // 🔹 Camas disponibles
+    @GetMapping("/available")
+    public ApiResponse<List<BedsEntity>> getAvailableBeds() {
+        ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
+        List<BedsEntity> beds = bedsService.getAvailableBeds();
+        response.setData(beds);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Camas disponibles");
+        return logApiResponse(response);
+    }
+
+    // 🔹 Camas ocupadas
+    @GetMapping("/occupied")
+    public ApiResponse<List<BedsEntity>> getOccupiedBeds() {
+        ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
+        List<BedsEntity> beds = bedsService.getOccupiedBeds();
+        response.setData(beds);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Camas ocupadas");
+        return logApiResponse(response);
+    }
+
+    // 🔹 Camas por habitación
+    @GetMapping("/room/{roomId}")
+    public ApiResponse<List<BedsEntity>> getBedsByRoomId(@PathVariable Long roomId) {
+        ApiResponse<List<BedsEntity>> response = new ApiResponse<>();
+        List<BedsEntity> beds = bedsService.getBedsByRoomId(roomId);
+        response.setData(beds);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Camas por habitación");
+        return logApiResponse(response);
+    }
+
+    // 🔹 Crear cama
     @PostMapping("/create")
-    public ApiResponse<Optional<BedsEntity>> createBed(@RequestBody  BedsEntity bedsEntity){
-        ApiResponse<Optional<BedsEntity>> response = new ApiResponse<>();
+    public ApiResponse<BedsEntity> createBed(@RequestBody BedsEntity bedsEntity) {
+        ApiResponse<BedsEntity> response = new ApiResponse<>();
         try {
             Optional<RoomsEntity> room = roomsService.getRoomById(bedsEntity.getRoom().getRoomId());
             if (room.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("la habitacion no fue encontrada");
+                response.setMessage("Sala no encontrada");
                 return logApiResponse(response);
             }
-            BedsEntity newBed = new BedsEntity();
-            newBed.setBedName(bedsEntity.getBedName());
-            newBed.setBedStatus(bedsEntity.getBedStatus());
-            newBed.setRoom(room.get());
-            Optional<BedsEntity> createdBed = bedsService.createBed(newBed);
-            response.setData(createdBed);
-            response.setStatus(HttpStatus.CREATED.value());
-            response.setMessage(HttpStatus.CREATED.getReasonPhrase());
-        }catch (ConstraintViolationException e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }
-        return logApiResponse(response);
-    }
-    @PutMapping("/update/{id}")
-    public ApiResponse<Optional<BedsEntity>> updateBed(@PathVariable Long id, @RequestBody BedsEntity bedsEntity){
-        ApiResponse<Optional<BedsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<RoomsEntity> room = roomsService.getRoomById(bedsEntity.getRoom().getRoomId());
-            if(room.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("Cama no encontrada");
-                return logApiResponse(response);
-            }
-            BedsEntity updatedBed = new BedsEntity();
-            updatedBed.setBedName(bedsEntity.getBedName());
-            updatedBed.setRoom(room.get());
-            Optional<BedsEntity> bed = bedsService.updateBed(id, updatedBed);
-            response.setData(bed);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-            
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }
-        return logApiResponse(response);
-    }
-    @DeleteMapping("/delete/{id}")
-    public ApiResponse<Optional<BedsEntity>> deleteBed(@PathVariable Long id){
-        ApiResponse<Optional<BedsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<BedsEntity> existingBed = bedsService.deleteBed(id);
-                response.setStatus(HttpStatus.OK.value());
-                response.setMessage(HttpStatus.OK.getReasonPhrase());
-                response.setMessage("Cama eliminada con exito");
 
-        }catch (Exception e){
+            bedsEntity.setRoom(room.get());
+            Optional<BedsEntity> created = bedsService.createBed(bedsEntity);
+            response.setData(created.get());
+            response.setStatus(HttpStatus.CREATED.value());
+            response.setMessage("Cama creada correctamente");
+
+        } catch (ConstraintViolationException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage("Restricción violada");
         }
+        return logApiResponse(response);
+    }
+
+    // 🔹 Actualizar cama
+    @PutMapping("/update/{id}")
+    public ApiResponse<BedsEntity> updateBed(@PathVariable Long id, @RequestBody BedsEntity bedsEntity) {
+        ApiResponse<BedsEntity> response = new ApiResponse<>();
+        Optional<BedsEntity> updated = bedsService.updateBed(id, bedsEntity);
+        response.setData(updated.get());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Cama actualizada correctamente");
+        return logApiResponse(response);
+    }
+
+    // 🔹 Eliminar cama
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<BedsEntity> deleteBed(@PathVariable Long id) {
+        ApiResponse<BedsEntity> response = new ApiResponse<>();
+        Optional<BedsEntity> deleted = bedsService.deleteBed(id);
+        response.setData(deleted.get());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Cama eliminada correctamente");
         return logApiResponse(response);
     }
 }

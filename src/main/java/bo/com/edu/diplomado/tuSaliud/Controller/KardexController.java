@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -234,4 +235,29 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
+
+    @GetMapping("/room/{roomId}")
+    public ApiResponse<List<KardexDto>> getKardexByRoomId(@PathVariable Long roomId) {
+        ApiResponse<List<KardexDto>> response = new ApiResponse<>();
+        try {
+            List<KardexDto> kardexList = kardexService.getKardexDtoByRoomId(roomId);
+            if (kardexList.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron kardex en esta sala");
+                return logApiResponse(response);
+            }
+            response.setData(kardexList);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+        return logApiResponse(response);
+    }
+
+
+
+
+
 }

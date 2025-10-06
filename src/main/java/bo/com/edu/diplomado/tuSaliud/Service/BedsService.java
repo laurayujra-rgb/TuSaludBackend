@@ -4,44 +4,64 @@ import bo.com.edu.diplomado.tuSaliud.Entity.BedsEntity;
 import bo.com.edu.diplomado.tuSaliud.Repository.BedsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BedsService {
+
     @Autowired
     public BedsRepository bedsRepository;
 
-    public List<BedsEntity> getAllBeds(){
+    // ✅ Listar todas
+    public List<BedsEntity> getAllBeds() {
         return bedsRepository.findAll();
     }
-    public List<BedsEntity> getAllBedsByStatus(){
+
+    // ✅ Listar solo activas
+    public List<BedsEntity> getAllBedsByStatus() {
         return bedsRepository.findAllByStatus();
     }
-    public Optional<BedsEntity>getBedById(Long id){
-        return Optional.of(bedsRepository.findByIdAndByStatus(id,1L));
+
+    // ✅ Buscar cama activa por ID
+    public Optional<BedsEntity> getBedById(Long id) {
+        return Optional.ofNullable(bedsRepository.findByIdAndByStatus(id, 1L));
     }
-    public Optional<BedsEntity> createBed(BedsEntity bedsEntity){
+
+    // ✅ Crear cama
+    public Optional<BedsEntity> createBed(BedsEntity bedsEntity) {
+        bedsEntity.setBedOccupied(false); // por defecto libre
         return Optional.of(bedsRepository.save(bedsEntity));
     }
-    public Optional<BedsEntity> updateBed(Long id, BedsEntity bedsEntity){
+
+    // ✅ Actualizar cama
+    public Optional<BedsEntity> updateBed(Long id, BedsEntity bedsEntity) {
         BedsEntity bed = bedsRepository.findByIdAndByStatus(id, 1L);
         bed.setBedName(bedsEntity.getBedName());
+        bed.setRoom(bedsEntity.getRoom());
         return Optional.of(bedsRepository.save(bed));
     }
-    public Optional<BedsEntity> deleteBed(Long id){
+
+    // ✅ Eliminar (soft delete)
+    public Optional<BedsEntity> deleteBed(Long id) {
         Optional<BedsEntity> existingBed = bedsRepository.findById(id);
-        if(existingBed.isEmpty()){
-            return Optional.empty();
-        }
+        if (existingBed.isEmpty()) return Optional.empty();
         BedsEntity bed = existingBed.get();
         bed.setBedStatus(0);
         return Optional.of(bedsRepository.save(bed));
     }
 
-    public List<BedsEntity> getBedsByRoomId(Long roomId){
+    // ✅ Camas por habitación
+    public List<BedsEntity> getBedsByRoomId(Long roomId) {
         return bedsRepository.findByRoomIdAndStatus(roomId);
     }
 
+    // ✅ Camas disponibles
+    public List<BedsEntity> getAvailableBeds() {
+        return bedsRepository.findAvailableBeds();
+    }
+
+    // ✅ Camas ocupadas
+    public List<BedsEntity> getOccupiedBeds() {
+        return bedsRepository.findOccupiedBeds();
+    }
 }

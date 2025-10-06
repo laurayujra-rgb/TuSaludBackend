@@ -2,15 +2,11 @@ package bo.com.edu.diplomado.tuSaliud.Controller;
 
 import bo.com.edu.diplomado.tuSaliud.Entity.RoomsEntity;
 import bo.com.edu.diplomado.tuSaliud.Models.Response.ApiResponse;
-import bo.com.edu.diplomado.tuSaliud.Service.RolesService;
 import bo.com.edu.diplomado.tuSaliud.Service.RoomsService;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -20,16 +16,7 @@ public class RoomsController extends ApiController {
     public RoomsService roomsService;
 
     @GetMapping("/all")
-    public ApiResponse<List<RoomsEntity>> getAllRooms(){
-        ApiResponse<List<RoomsEntity>> response = new ApiResponse<>();
-        List<RoomsEntity> rooms = roomsService.getAllRooms();
-        response.setData(rooms);
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage("OK");
-        return logApiResponse(response);
-    }
-    @GetMapping
-    public ApiResponse<List<RoomsEntity>> getAllRoomsByStatus(){
+    public ApiResponse<List<RoomsEntity>> getAllRooms() {
         ApiResponse<List<RoomsEntity>> response = new ApiResponse<>();
         List<RoomsEntity> rooms = roomsService.getAllRoomsByStatus();
         response.setData(rooms);
@@ -37,93 +24,52 @@ public class RoomsController extends ApiController {
         response.setMessage("OK");
         return logApiResponse(response);
     }
-    @GetMapping("/{id}")
-    public ApiResponse<RoomsEntity> getRoomById(@PathVariable Long id){
-        ApiResponse<RoomsEntity> response = new ApiResponse<>();
-        try{
-            Optional<RoomsEntity> optionalRoom = roomsService.getRoomById(id);
-            if(optionalRoom.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("La sala no fue encontrada");
-                return logApiResponse(response);
-            }
-            RoomsEntity roomResponse = new RoomsEntity();
-            roomResponse.setRoomName(optionalRoom.get().getRoomName());
-            response.setData(roomResponse);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-            response.setMessage(e.getMessage());
-        }
+
+    @GetMapping("/available")
+    public ApiResponse<List<RoomsEntity>> getAvailableRooms() {
+        ApiResponse<List<RoomsEntity>> response = new ApiResponse<>();
+        response.setData(roomsService.getAvailableRooms());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Salas disponibles");
         return logApiResponse(response);
     }
+
+    @GetMapping("/occupied")
+    public ApiResponse<List<RoomsEntity>> getOccupiedRooms() {
+        ApiResponse<List<RoomsEntity>> response = new ApiResponse<>();
+        response.setData(roomsService.getOccupiedRooms());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Salas ocupadas");
+        return logApiResponse(response);
+    }
+
     @PostMapping("/create")
-    public ApiResponse<Optional<RoomsEntity>> createRoom(@RequestBody RoomsEntity roomsEntity){
-        ApiResponse<Optional<RoomsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<RoomsEntity> optionalRoom = roomsService.createRoom(roomsEntity);
-            response.setData(optionalRoom);
-            response.setStatus(HttpStatus.CREATED.value());
-            response.setMessage(HttpStatus.CREATED.getReasonPhrase());
-            response.setMessage("Sala creada");
-        }catch (ConstraintViolationException e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-            response.setMessage(e.getMessage());
-        }
+    public ApiResponse<RoomsEntity> createRoom(@RequestBody RoomsEntity room) {
+        ApiResponse<RoomsEntity> response = new ApiResponse<>();
+        Optional<RoomsEntity> created = roomsService.createRoom(room);
+        response.setData(created.get());
+        response.setStatus(HttpStatus.CREATED.value());
+        response.setMessage("Sala creada correctamente");
         return logApiResponse(response);
     }
+
     @PutMapping("/update/{id}")
-    public ApiResponse<Optional<RoomsEntity>> updateRoom(@PathVariable Long id, @RequestBody RoomsEntity roomsEntity){
-        ApiResponse<Optional<RoomsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<RoomsEntity> optionalRoom = roomsService.updateRoom(id, roomsEntity);
-            if(optionalRoom.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("La sala no fue encontrada");
-                return logApiResponse(response);
-            }
-            response.setData(optionalRoom);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-            response.setMessage("Sala actualizada");
-        }catch (ConstraintViolationException e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-            response.setMessage(e.getMessage());
-        }
+    public ApiResponse<RoomsEntity> updateRoom(@PathVariable Long id, @RequestBody RoomsEntity room) {
+        ApiResponse<RoomsEntity> response = new ApiResponse<>();
+        Optional<RoomsEntity> updated = roomsService.updateRoom(id, room);
+        response.setData(updated.get());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Sala actualizada correctamente");
         return logApiResponse(response);
     }
+
     @DeleteMapping("/delete/{id}")
-    public ApiResponse<Optional<RoomsEntity>> deleteRoom(@PathVariable Long id){
-        ApiResponse<Optional<RoomsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<RoomsEntity> optionalRoom = roomsService.deleteRoom(id);
-            if(optionalRoom.isEmpty()){
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("La sala no fue encontrada");
-                return logApiResponse(response);
-            }
-            response.setData(optionalRoom);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-            response.setMessage("Sala eliminada");
-        }catch (Exception e){
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-            response.setMessage(e.getMessage());
-        }
+    public ApiResponse<RoomsEntity> deleteRoom(@PathVariable Long id) {
+        ApiResponse<RoomsEntity> response = new ApiResponse<>();
+        Optional<RoomsEntity> deleted = roomsService.deleteRoom(id);
+        response.setData(deleted.get());
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("Sala eliminada correctamente");
         return logApiResponse(response);
     }
 }

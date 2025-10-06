@@ -26,37 +26,35 @@ public class KardexEntity {
     private String kardexDate;
     private String kardexHour;
     private Integer kardexStatus;
+    private String nursingActions;
 
-    // Relación con paciente
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private PersonsEntity patient;
 
-    // Relación con enfermera
     @ManyToOne
     @JoinColumn(name = "nurse_id", nullable = false)
     private PersonsEntity nurse;
 
-    // Relación con signos vitales
-    @JsonIgnore
-    @OneToMany(mappedBy = "kardex", fetch = FetchType.LAZY)
-    private List<VitalSignsEntity> vitalSigns;
-
-    // Relación con dietas
     @ManyToOne
     @JoinColumn(name = "diet_id", nullable = false)
     private DietsEntity diets;
 
-    // Relación con medicamentos
+    // 🔹 Nueva relación
+    @ManyToOne
+    @JoinColumn(name = "bed_id", nullable = true)
+    private BedsEntity bed;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "kardex", fetch = FetchType.LAZY)
+    private List<VitalSignsEntity> vitalSigns;
+
     @OneToMany(mappedBy = "kardex", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KardexMedicinesEntity> kardexMedicines = new ArrayList<>();
 
-    // Relación con reportes
     @OneToMany(mappedBy = "kardex", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportsEntity> reports = new ArrayList<>();
-
-    private String nursingActions;
 
     @PrePersist
     public void prePersist() {

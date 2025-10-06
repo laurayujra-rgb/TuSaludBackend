@@ -18,8 +18,10 @@ public class BedsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bedId;
+
     private String bedName;
-    private Integer bedStatus;
+    private Integer bedStatus;      // 1 = activo, 0 = eliminado
+    private Boolean bedOccupied;    // true = ocupada, false = libre
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
@@ -28,5 +30,6 @@ public class BedsEntity {
     @PrePersist
     public void prePersist() {
         this.bedStatus = 1;
+        this.bedOccupied = false;
     }
 }

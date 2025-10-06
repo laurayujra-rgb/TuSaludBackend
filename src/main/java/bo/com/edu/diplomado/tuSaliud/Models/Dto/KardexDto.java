@@ -1,7 +1,5 @@
 package bo.com.edu.diplomado.tuSaliud.Models.Dto;
 
-
-
 import lombok.*;
 
 @Getter
@@ -18,13 +16,19 @@ public class KardexDto {
     private Integer kardexStatus;
     private String nursingActions;
 
-    // Dieta (simplificada)
+    // Dieta
     private Long dietId;
     private String dietName;
 
+    // Paciente y enfermera
     private Long patientId;
     private String patientName;
-
     private Long nurseId;
     private String nurseName;
+
+    // 🔹 Nueva info de cama/sala
+    private Long bedId;
+    private String bedName;
+    private Long roomId;
+    private String roomName;
 }
