@@ -64,6 +64,7 @@ public class VitalSignsController extends ApiController{
             vitalSignsResponse.setVitalSignsOxygenSaturation(optionalVitalSigns.get().getVitalSignsOxygenSaturation());
             vitalSignsResponse.setVitalSignsStatus(optionalVitalSigns.get().getVitalSignsStatus());
             vitalSignsResponse.setKardex(optionalVitalSigns.get().getKardex());
+            vitalSignsResponse.setNureseName(optionalVitalSigns.get().getNureseName());
             response.setData(vitalSignsResponse);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
@@ -96,6 +97,7 @@ public class VitalSignsController extends ApiController{
             vitalSigns.setVitalSignsBloodPressure(vitalSignsEntity.getVitalSignsBloodPressure());
             vitalSigns.setVitalSignsOxygenSaturation(vitalSignsEntity.getVitalSignsOxygenSaturation());
             vitalSigns.setVitalSignsStatus(vitalSignsEntity.getVitalSignsStatus());
+            vitalSigns.setNureseName(vitalSignsEntity.getNureseName());
             vitalSigns.setKardex(kardex.get());
 
             Optional<VitalSignsEntity> createdVitalSigns = vitalSignsService.createVitalSigns(vitalSigns);
@@ -161,6 +163,7 @@ public class VitalSignsController extends ApiController{
             vitalSigns.setVitalSignsBloodPressure(vitalSignsEntity.getVitalSignsBloodPressure());
             vitalSigns.setVitalSignsOxygenSaturation(vitalSignsEntity.getVitalSignsOxygenSaturation());
             vitalSigns.setVitalSignsStatus(vitalSignsEntity.getVitalSignsStatus());
+            vitalSigns.setNureseName(vitalSignsEntity.getNureseName());
             vitalSigns.setKardex(kardex.get());
             Optional<VitalSignsEntity> updatedVitalSigns = vitalSignsService.updateVitalSigns(id, vitalSigns);
             response.setData(updatedVitalSigns);

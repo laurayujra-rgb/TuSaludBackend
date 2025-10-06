@@ -106,6 +106,57 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
+    @GetMapping("/{id}/patient-info")
+    public ApiResponse<Object> getPatientInfoByKardexId(@PathVariable Long id) {
+        ApiResponse<Object> response = new ApiResponse<>();
+
+        try {
+            Optional<KardexEntity> opt = kardexService.getKardexById(id);
+            if (opt.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Kardex no encontrado");
+                return logApiResponse(response);
+            }
+
+            var kardex = opt.get();
+            var patient = kardex.getPatient();
+
+            if (patient == null) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Paciente no encontrado en el Kardex");
+                return logApiResponse(response);
+            }
+
+            // 🔹 Calcular edad
+            Integer edad = null;
+            if (patient.getPersonBirthdate() != null) {
+                java.time.LocalDate birth = java.time.LocalDate.parse(patient.getPersonBirthdate().toString());
+                java.time.LocalDate now = java.time.LocalDate.now();
+                edad = java.time.Period.between(birth, now).getYears();
+            }
+
+            // 🔹 Crear objeto simple
+            var data = new java.util.HashMap<String, Object>();
+            data.put("patientId", patient.getPersonId());
+            data.put("patientName", (patient.getPersonName() + " " +
+                    (patient.getPersonFatherSurname() != null ? patient.getPersonFatherSurname() : "") + " " +
+                    (patient.getPersonMotherSurname() != null ? patient.getPersonMotherSurname() : "")).trim());
+            data.put("personBirthdate", patient.getPersonBirthdate());
+            data.put("personAge", edad);
+
+            response.setData(data);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        }
+
+        return logApiResponse(response);
+    }
+
+
     // ===== POST /create
     @PostMapping("/create")
     public ApiResponse<KardexDto> createKardex(@RequestBody KardexEntity kardexEntity) {

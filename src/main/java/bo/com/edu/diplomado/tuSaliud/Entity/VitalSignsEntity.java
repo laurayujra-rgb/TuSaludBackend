@@ -25,6 +25,7 @@ public class VitalSignsEntity {
     private String VitalSignsBloodPressure;
     private String VitalSignsOxygenSaturation;
     private Integer vitalSignsStatus;
+    private String nureseName;
 
     @ManyToOne
     @JoinColumn(name = "kardex_id", nullable = false)

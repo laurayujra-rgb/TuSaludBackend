@@ -36,6 +36,7 @@ public class VitalSignsService {
         vitalSigns.setVitalSignsRespiratoryRate(vitalSignsEntity.getVitalSignsRespiratoryRate());
         vitalSigns.setVitalSignsBloodPressure(vitalSignsEntity.getVitalSignsBloodPressure());
         vitalSigns.setVitalSignsOxygenSaturation(vitalSignsEntity.getVitalSignsOxygenSaturation());
+        vitalSigns.setNureseName(vitalSignsEntity.getNureseName());
         return Optional.of(vitalSignsRepository.save(vitalSigns));
     }
     public Optional<VitalSignsEntity> deleteVitalSigns(Long id){
@@ -65,6 +66,7 @@ public class VitalSignsService {
                 entity.getVitalSignsBloodPressure(),
                 entity.getVitalSignsOxygenSaturation(),
                 entity.getVitalSignsStatus(),
+                entity.getNureseName(),
                 entity.getKardex() != null ? entity.getKardex().getKardexId() : null
         );
     }

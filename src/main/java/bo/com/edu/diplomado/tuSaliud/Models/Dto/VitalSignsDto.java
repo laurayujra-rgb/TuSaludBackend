@@ -17,5 +17,6 @@ public class VitalSignsDto {
     private String vitalSignsBloodPressure;
     private String vitalSignsOxygenSaturation;
     private Integer vitalSignsStatus;
+    private String nureseName;
     private Long kardexId;
 }
