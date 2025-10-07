@@ -91,15 +91,31 @@ public class BedsController extends ApiController {
     }
 
     // 🔹 Actualizar cama
+// 🔹 Actualizar cama
     @PutMapping("/update/{id}")
     public ApiResponse<BedsEntity> updateBed(@PathVariable Long id, @RequestBody BedsEntity bedsEntity) {
         ApiResponse<BedsEntity> response = new ApiResponse<>();
-        Optional<BedsEntity> updated = bedsService.updateBed(id, bedsEntity);
-        response.setData(updated.get());
-        response.setStatus(HttpStatus.OK.value());
-        response.setMessage("Cama actualizada correctamente");
+        try {
+            // ⚠️ Forzar el ID correcto en la entidad, por seguridad
+            bedsEntity.setBedId(id);
+
+            Optional<BedsEntity> updated = bedsService.updateBed(bedsEntity);
+            if (updated.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Cama no encontrada");
+                return logApiResponse(response);
+            }
+
+            response.setData(updated.get());
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage("Cama actualizada correctamente");
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al actualizar la cama: " + e.getMessage());
+        }
         return logApiResponse(response);
     }
+
 
     // 🔹 Eliminar cama
     @DeleteMapping("/delete/{id}")

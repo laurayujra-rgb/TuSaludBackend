@@ -29,6 +29,11 @@ public class PersonsEntity {
     private Integer personStatus;
 
     @ManyToOne
+    @JoinColumn(name = "bed_id", nullable = true)
+    private BedsEntity bed;
+
+
+    @ManyToOne
     @JoinColumn(name = "gender_id", nullable = false)
     private GendersEntity gender;
 

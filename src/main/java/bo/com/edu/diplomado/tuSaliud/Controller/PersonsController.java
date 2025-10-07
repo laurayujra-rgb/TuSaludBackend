@@ -12,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/persons")
-public class PersonsController extends ApiController{
+public class PersonsController extends ApiController {
 
     @Autowired
     public GendersService gendersService;
@@ -28,7 +27,7 @@ public class PersonsController extends ApiController{
     public PersonsService personsService;
 
     @GetMapping("/all")
-    public ApiResponse<List<PersonsEntity>> getAllPersons(){
+    public ApiResponse<List<PersonsEntity>> getAllPersons() {
         ApiResponse<List<PersonsEntity>> response = new ApiResponse<>();
         List<PersonsEntity> persons = personsService.gettAllPersons();
         response.setData(persons);
@@ -36,8 +35,9 @@ public class PersonsController extends ApiController{
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
+
     @GetMapping
-    public ApiResponse<List<PersonsEntity>> getAllPersonsByStatus(){
+    public ApiResponse<List<PersonsEntity>> getAllPersonsByStatus() {
         ApiResponse<List<PersonsEntity>> response = new ApiResponse<>();
         List<PersonsEntity> persons = personsService.getAllPersonsByStatus();
         response.setData(persons);
@@ -45,27 +45,26 @@ public class PersonsController extends ApiController{
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
+
     @GetMapping("/{id}")
-    public ApiResponse<PersonsEntity> getPersonById(@PathVariable Long id){
+    public ApiResponse<PersonsEntity> getPersonById(@PathVariable Long id) {
         ApiResponse<PersonsEntity> response = new ApiResponse<>();
-        try{
+        try {
             Optional<PersonsEntity> optionalPerson = personsService.getPersonById(id);
-            if(optionalPerson.isEmpty()){
+            if (optionalPerson.isEmpty()) {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
                 response.setMessage("La persona no fue encontrada");
                 return logApiResponse(response);
             }
-            // ✅ Devuelve directamente la entidad encontrada
             response.setData(optionalPerson.get());
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setMessage("Error al obtener persona");
         }
         return logApiResponse(response);
     }
-
 
     @GetMapping("/role/{roleId}")
     public ApiResponse<List<PersonsEntity>> getPersonsByRoleId(@PathVariable Long roleId) {
@@ -88,23 +87,36 @@ public class PersonsController extends ApiController{
     }
 
     @PostMapping("/create")
-    public ApiResponse<Optional<PersonsEntity>> createPerson(@RequestBody PersonsEntity personsEntity){
+    public ApiResponse<Optional<PersonsEntity>> createPerson(@RequestBody PersonsEntity personsEntity) {
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();
-        try{
-            Optional<GendersEntity> gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
-            if(gender.isEmpty()){
+        try {
+            // Validaciones básicas para evitar NPE
+            if (personsEntity.getGender() == null || personsEntity.getGender().getGenderId() == 0) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("Gender  was not found");
+                response.setMessage("Debe especificar un género válido");
+                return logApiResponse(response);
+            }
+            if (personsEntity.getRole() == null || personsEntity.getRole().getRoleId() == 0) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Debe especificar un rol válido");
+                return logApiResponse(response);
+            }
+
+            // Validar y setear entidades administradas (Gender / Role)
+            Optional<GendersEntity> gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
+            if (gender.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Gender was not found");
                 return logApiResponse(response);
             }
             Optional<RolesEntity> role = rolesService.getRolesById(personsEntity.getRole().getRoleId());
-            if(role.isEmpty()){
+            if (role.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("Role  was not found");
+                response.setMessage("Role was not found");
                 return logApiResponse(response);
             }
+
+            // Construir entidad a persistir (conservar cama enviada si corresponde)
             PersonsEntity person = new PersonsEntity();
             person.setPersonName(personsEntity.getPersonName());
             person.setPersonFatherSurname(personsEntity.getPersonFatherSurname());
@@ -112,47 +124,72 @@ public class PersonsController extends ApiController{
             person.setPersonDni(personsEntity.getPersonDni());
             person.setPersonBirthdate(personsEntity.getPersonBirthdate());
             person.setPersonAge(personsEntity.getPersonAge());
-            person.setPersonStatus(personsEntity.getPersonStatus());
+            person.setPersonStatus(personsEntity.getPersonStatus()); // puede venir null y PrePersist lo setea a 1
             person.setGender(gender.get());
             person.setRole(role.get());
-            Optional<PersonsEntity> createPerson = personsService.createPerson(person);
-            response.setData(createPerson);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch(ConstraintViolationException e){
+
+            // Si es paciente (4), permitimos que el body traiga bed { bedId }
+            if (role.get().getRoleId() == 4) {
+                person.setBed(personsEntity.getBed()); // el Service valida existencia/ocupación
+            } else {
+                person.setBed(null);
+            }
+
+            Optional<PersonsEntity> created = personsService.createPerson(person);
+            response.setData(created);
+            response.setStatus(HttpStatus.CREATED.value());
+            response.setMessage("Creado");
+        } catch (ConstraintViolationException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-    }catch (Exception e){
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage("Restricción violada");
+        } catch (RuntimeException e) {
+            // Errores de negocio desde el Service (cama ocupada, inexistente, etc.)
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al crear persona");
         }
         return logApiResponse(response);
     }
+
     @PutMapping("/update/{id}")
-    public ApiResponse<Optional<PersonsEntity>> updatePerson(@PathVariable Long id, @RequestBody PersonsEntity personsEntity ){
+    public ApiResponse<Optional<PersonsEntity>> updatePerson(@PathVariable Long id, @RequestBody PersonsEntity personsEntity) {
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();
-        try{
+        try {
             Optional<PersonsEntity> existingPerson = personsService.getPersonById(id);
-            if(existingPerson.isEmpty()){
+            if (existingPerson.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                response.setMessage("person was not found");
+                response.setMessage("Person was not found");
                 return logApiResponse(response);
             }
-//            validate if gender exists
-            Optional<GendersEntity>gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
-            if(gender.isEmpty()){
+
+            // Validaciones de entidades relacionadas
+            if (personsEntity.getGender() == null || personsEntity.getGender().getGenderId() == 0) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                response.setMessage("Debe especificar un género válido");
+                return logApiResponse(response);
+            }
+            if (personsEntity.getRole() == null || personsEntity.getRole().getRoleId() == 0) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Debe especificar un rol válido");
+                return logApiResponse(response);
+            }
+
+            Optional<GendersEntity> gender = gendersService.getGenderById(personsEntity.getGender().getGenderId());
+            if (gender.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("gender was not found");
+                return logApiResponse(response);
             }
-//            validate if rol exists
-            Optional<RolesEntity>role =  rolesService.getRolesById(personsEntity.getRole().getRoleId());
-            if(role.isEmpty()){
+            Optional<RolesEntity> role = rolesService.getRolesById(personsEntity.getRole().getRoleId());
+            if (role.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("role was not found");
+                return logApiResponse(response);
             }
+
+            // Construimos entidad con los cambios (incluida la posible cama)
             PersonsEntity updatePersons = new PersonsEntity();
             updatePersons.setPersonName(personsEntity.getPersonName());
             updatePersons.setPersonFatherSurname(personsEntity.getPersonFatherSurname());
@@ -163,24 +200,35 @@ public class PersonsController extends ApiController{
             updatePersons.setPersonStatus(personsEntity.getPersonStatus());
             updatePersons.setGender(gender.get());
             updatePersons.setRole(role.get());
+
+            // Si es paciente, permitimos cama (service valida disponibilidad / libera la anterior)
+            if (role.get().getRoleId() == 4) {
+                updatePersons.setBed(personsEntity.getBed()); // puede venir null si no desea cambiar la cama
+            } else {
+                updatePersons.setBed(null); // si deja de ser paciente, se libera en el service
+            }
+
             Optional<PersonsEntity> updateEntity = personsService.updatePerson(id, updatePersons);
             response.setData(updateEntity);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
+        } catch (RuntimeException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al actualizar persona");
         }
         return logApiResponse(response);
     }
+
     @DeleteMapping("/delete/{id}")
-    public ApiResponse<Optional<PersonsEntity>> deletePerson(@PathVariable Long id){
+    public ApiResponse<Optional<PersonsEntity>> deletePerson(@PathVariable Long id) {
         ApiResponse<Optional<PersonsEntity>> response = new ApiResponse<>();
-        try{
+        try {
             Optional<PersonsEntity> existingPerson = personsService.getPersonById(id);
-            if(existingPerson.isEmpty()){
+            if (existingPerson.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
                 response.setMessage("person was not found");
                 return logApiResponse(response);
             }
@@ -188,9 +236,33 @@ public class PersonsController extends ApiController{
             response.setData(deleteEntity);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-        }catch (Exception e){
+        } catch (RuntimeException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al eliminar persona");
+        }
+        return logApiResponse(response);
+    }
+
+
+    @GetMapping("/rooms/{roomId}/patients")
+    public ApiResponse<List<PersonsEntity>> getPatientsByRoom(@PathVariable Long roomId) {
+        ApiResponse<List<PersonsEntity>> response = new ApiResponse<>();
+        try {
+            List<PersonsEntity> patients = personsService.getPatientsByRoomId(roomId);
+            if (patients.isEmpty()) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("No se encontraron pacientes en esta sala");
+                return logApiResponse(response);
+            }
+            response.setData(patients);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error al obtener pacientes por sala");
         }
         return logApiResponse(response);
     }
