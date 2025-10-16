@@ -198,8 +198,11 @@ public class PersonsController extends ApiController {
             updatePersons.setPersonBirthdate(personsEntity.getPersonBirthdate());
             updatePersons.setPersonAge(personsEntity.getPersonAge());
             updatePersons.setPersonStatus(personsEntity.getPersonStatus());
+//            personStatu =1
+            updatePersons.setPersonStatus(1);
             updatePersons.setGender(gender.get());
             updatePersons.setRole(role.get());
+
 
             // Si es paciente, permitimos cama (service valida disponibilidad / libera la anterior)
             if (role.get().getRoleId() == 4) {
