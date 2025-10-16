@@ -16,6 +16,7 @@ public class KardexDto {
     private String kardexHour;
     private Integer kardexStatus;
     private String nursingActions;
+    private String nurseLic;
 
     // 🔹 Información de dieta
     private Long dietId;
@@ -24,6 +25,7 @@ public class KardexDto {
     // 🔹 Información de paciente
     private Long patientId;
     private String patientName;
+
 
     // ❌ Eliminado nurse
     // private Long nurseId;

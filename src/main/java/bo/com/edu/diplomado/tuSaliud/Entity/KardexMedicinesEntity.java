@@ -47,6 +47,7 @@ public class KardexMedicinesEntity {
     private String frequency;  // ej: "cada 8 horas"
     private String routeNote;  // nota de vía
     private String notes;      // indicaciones
+    private String nurseLic;
 
     // Soft-delete igual que tu Kardex
     private Integer status;

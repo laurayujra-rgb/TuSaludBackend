@@ -35,7 +35,8 @@ public class KardexMedicinesService {
                 entity.getFrequency(),
                 entity.getRouteNote(),
                 entity.getNotes(),
-                entity.getStatus()
+                entity.getStatus(),
+                entity.getNurseLic()
         );
     }
 
@@ -97,6 +98,9 @@ public class KardexMedicinesService {
         if (data.getRouteNote() != null) current.setRouteNote(data.getRouteNote());
         if (data.getNotes() != null) current.setNotes(data.getNotes());
         if (data.getStatus() != null) current.setStatus(data.getStatus());
+        if (data.getNurseLic() != null) current.setNurseLic(data.getNurseLic());
+
+
 
         return Optional.of(kardexMedicinesRepository.save(current));
     }

@@ -35,6 +35,8 @@ public class KardexService {
                 entity.getKardexHour(),
                 entity.getKardexStatus(),
                 entity.getNursingActions(),
+                entity.getNurseLic(),
+
 
                 entity.getDiets() != null ? entity.getDiets().getDietId() : null,
                 entity.getDiets() != null ? entity.getDiets().getDietName() : null,
@@ -77,6 +79,7 @@ public class KardexService {
         kardex.setNursingActions(kardexEntity.getNursingActions());
         kardex.setDiets(kardexEntity.getDiets());
         kardex.setPatient(kardexEntity.getPatient());
+        kardex.setNurseLic(kardexEntity.getNurseLic());
 
         // ❌ Eliminado kardex.setNurse()
 

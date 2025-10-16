@@ -27,6 +27,7 @@ public class KardexEntity {
     private String kardexHour;
     private Integer kardexStatus;
     private String nursingActions;
+    private String nurseLic;
 
     // 🔹 Solo relación con paciente
     @ManyToOne

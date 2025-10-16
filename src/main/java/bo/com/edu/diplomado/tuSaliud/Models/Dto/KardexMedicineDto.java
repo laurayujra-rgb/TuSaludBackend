@@ -17,4 +17,5 @@ public class KardexMedicineDto {
     private String routeNote;
     private String notes;
     private Integer status;
+    private String nurseLic;
 }
