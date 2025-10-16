@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,7 +24,7 @@ public class KardexController extends ApiController {
     @Autowired
     public DietsService dietsService;
 
-    // ===== GET /all
+    // ===== GET /all =====
     @GetMapping("/all")
     public ApiResponse<List<KardexDto>> getAllKardex() {
         ApiResponse<List<KardexDto>> response = new ApiResponse<>();
@@ -41,7 +40,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    // ===== GET /{id}
+    // ===== GET /{id} =====
     @GetMapping("/{id}")
     public ApiResponse<KardexDto> getKardexById(@PathVariable Long id) {
         ApiResponse<KardexDto> response = new ApiResponse<>();
@@ -62,7 +61,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    // ===== GET /patient/{patientId}
+    // ===== GET /patient/{patientId} =====
     @GetMapping("/patient/{patientId}")
     public ApiResponse<List<KardexDto>> getKardexByPatient(@PathVariable Long patientId) {
         ApiResponse<List<KardexDto>> response = new ApiResponse<>();
@@ -83,7 +82,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    // ===== GET /patient/{patientId}/role/{roleId}
+    // ===== GET /patient/{patientId}/role/{roleId} =====
     @GetMapping("/patient/{patientId}/role/{roleId}")
     public ApiResponse<List<KardexDto>> getKardexByPatientAndRole(
             @PathVariable Long patientId,
@@ -107,58 +106,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    @GetMapping("/{id}/patient-info")
-    public ApiResponse<Object> getPatientInfoByKardexId(@PathVariable Long id) {
-        ApiResponse<Object> response = new ApiResponse<>();
-
-        try {
-            Optional<KardexEntity> opt = kardexService.getKardexById(id);
-            if (opt.isEmpty()) {
-                response.setStatus(HttpStatus.NOT_FOUND.value());
-                response.setMessage("Kardex no encontrado");
-                return logApiResponse(response);
-            }
-
-            var kardex = opt.get();
-            var patient = kardex.getPatient();
-
-            if (patient == null) {
-                response.setStatus(HttpStatus.NOT_FOUND.value());
-                response.setMessage("Paciente no encontrado en el Kardex");
-                return logApiResponse(response);
-            }
-
-            // 🔹 Calcular edad
-            Integer edad = null;
-            if (patient.getPersonBirthdate() != null) {
-                java.time.LocalDate birth = java.time.LocalDate.parse(patient.getPersonBirthdate().toString());
-                java.time.LocalDate now = java.time.LocalDate.now();
-                edad = java.time.Period.between(birth, now).getYears();
-            }
-
-            // 🔹 Crear objeto simple
-            var data = new java.util.HashMap<String, Object>();
-            data.put("patientId", patient.getPersonId());
-            data.put("patientName", (patient.getPersonName() + " " +
-                    (patient.getPersonFatherSurname() != null ? patient.getPersonFatherSurname() : "") + " " +
-                    (patient.getPersonMotherSurname() != null ? patient.getPersonMotherSurname() : "")).trim());
-            data.put("personBirthdate", patient.getPersonBirthdate());
-            data.put("personAge", edad);
-
-            response.setData(data);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-
-        } catch (Exception e) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(e.getMessage());
-        }
-
-        return logApiResponse(response);
-    }
-
-
-    // ===== POST /create
+    // ===== POST /create =====
     @PostMapping("/create")
     public ApiResponse<KardexDto> createKardex(@RequestBody KardexEntity kardexEntity) {
         ApiResponse<KardexDto> response = new ApiResponse<>();
@@ -187,7 +135,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    // ===== PUT /update/{id}
+    // ===== PUT /update/{id} =====
     @PutMapping("/update/{id}")
     public ApiResponse<KardexDto> updateKardex(@PathVariable Long id, @RequestBody KardexEntity kardexEntity) {
         ApiResponse<KardexDto> response = new ApiResponse<>();
@@ -215,7 +163,7 @@ public class KardexController extends ApiController {
         return logApiResponse(response);
     }
 
-    // ===== DELETE /delete/{id}
+    // ===== DELETE /delete/{id} =====
     @DeleteMapping("/delete/{id}")
     public ApiResponse<KardexDto> deleteKardex(@PathVariable Long id) {
         ApiResponse<KardexDto> response = new ApiResponse<>();
@@ -235,29 +183,4 @@ public class KardexController extends ApiController {
         }
         return logApiResponse(response);
     }
-
-    @GetMapping("/room/{roomId}")
-    public ApiResponse<List<KardexDto>> getKardexByRoomId(@PathVariable Long roomId) {
-        ApiResponse<List<KardexDto>> response = new ApiResponse<>();
-        try {
-            List<KardexDto> kardexList = kardexService.getKardexDtoByRoomId(roomId);
-            if (kardexList.isEmpty()) {
-                response.setStatus(HttpStatus.NOT_FOUND.value());
-                response.setMessage("No se encontraron kardex en esta sala");
-                return logApiResponse(response);
-            }
-            response.setData(kardexList);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-        } catch (Exception e) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setMessage(e.getMessage());
-        }
-        return logApiResponse(response);
-    }
-
-
-
-
-
 }

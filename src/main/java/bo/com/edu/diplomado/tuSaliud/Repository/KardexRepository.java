@@ -19,12 +19,6 @@ public interface KardexRepository extends JpaRepository<KardexEntity, Long> {
     @Query("select k from KardexEntity k where k.patient.personId = ?1 and k.patient.role.roleId = ?2 and k.kardexStatus = 1 order by k.kardexId asc")
     List<KardexEntity> findAllByPatientIdAndRoleId(Long patientId, Long roleId);
 
-    @Query("""
-SELECT k FROM KardexEntity k
-    WHERE k.bed.room.roomId = :roomId
-      AND k.kardexStatus = 1
-    ORDER BY k.kardexId ASC
-""")
-    List<KardexEntity> findAllByRoomId(Long roomId);
+
 
 }

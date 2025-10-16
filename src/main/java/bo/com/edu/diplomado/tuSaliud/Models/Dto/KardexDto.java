@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class KardexDto {
+
     private Long kardexId;
     private Integer kardexNumber;
     private String kardexDiagnosis;
@@ -16,19 +17,15 @@ public class KardexDto {
     private Integer kardexStatus;
     private String nursingActions;
 
-    // Dieta
+    // 🔹 Información de dieta
     private Long dietId;
     private String dietName;
 
-    // Paciente y enfermera
+    // 🔹 Información de paciente
     private Long patientId;
     private String patientName;
-    private Long nurseId;
-    private String nurseName;
 
-    // 🔹 Nueva info de cama/sala
-    private Long bedId;
-    private String bedName;
-    private Long roomId;
-    private String roomName;
+    // ❌ Eliminado nurse
+    // private Long nurseId;
+    // private String nurseName;
 }

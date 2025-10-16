@@ -28,22 +28,19 @@ public class KardexEntity {
     private Integer kardexStatus;
     private String nursingActions;
 
+    // 🔹 Solo relación con paciente
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private PersonsEntity patient;
 
-    @ManyToOne
-    @JoinColumn(name = "nurse_id", nullable = false)
-    private PersonsEntity nurse;
+    // ❌ Eliminado nurse
+    // @ManyToOne
+    // @JoinColumn(name = "nurse_id", nullable = false)
+    // private PersonsEntity nurse;
 
     @ManyToOne
     @JoinColumn(name = "diet_id", nullable = false)
     private DietsEntity diets;
-
-    // 🔹 Nueva relación
-    @ManyToOne
-    @JoinColumn(name = "bed_id", nullable = true)
-    private BedsEntity bed;
 
     @JsonIgnore
     @OneToMany(mappedBy = "kardex", fetch = FetchType.LAZY)

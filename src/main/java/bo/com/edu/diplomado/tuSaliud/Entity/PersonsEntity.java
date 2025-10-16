@@ -58,9 +58,9 @@ public class PersonsEntity {
     @ToString.Exclude
     private List<KardexEntity> kardexAsPatient = new ArrayList<>();
 
-    // Relación: Persona como Enfermera en muchos Kardex
-    @OneToMany(mappedBy = "nurse", fetch = FetchType.LAZY)
-    @JsonIgnore
-    @ToString.Exclude
-    private List<KardexEntity> kardexAsNurse = new ArrayList<>();
+//    // Relación: Persona como Enfermera en muchos Kardex
+//    @OneToMany(mappedBy = "nurse", fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    @ToString.Exclude
+//    private List<KardexEntity> kardexAsNurse = new ArrayList<>();
 }
